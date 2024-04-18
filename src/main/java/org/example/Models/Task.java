@@ -16,30 +16,19 @@ public class Task extends Operation implements Itask {
 
     private Departments department;
 
-    private final int id;
 
     private ArrayList<Employee> assignedEmployees;
-    private static int taskId = 0;//to be removed when i add the database.
+
     public Task(String name, Date startDate, Date endDate, Date deadline, String department) {
         super(name, startDate, endDate, deadline);
         setDepartment(department);
         this.assignedEmployees = new ArrayList<>();
-        this.id = taskId++;
     }
 
-
-    public int getId() {
-        return id;
-    }
-
-    public static int getTaskId() {
-        return taskId;
-    }
 
     public Task(String name, Date deadLine, String department) {
         super(name, deadLine);
         setDepartment(department);
-        this.id = taskId++;
     }
 
     public boolean isState() {
@@ -70,20 +59,21 @@ public class Task extends Operation implements Itask {
         this.assignedEmployees = assignedEmployees;
     }
 
-    public void addAssignedEmployees(Employee employee){
+    public void addAssignedEmployees(Employee employee) {
         this.assignedEmployees.add(employee);
     }
 
-    public void removeAssignedEmployees(Employee employee){
-        if(this.assignedEmployees.contains(employee)){
+    public void removeAssignedEmployees(Employee employee) {
+        if (this.assignedEmployees.contains(employee)) {
             this.assignedEmployees.remove(employee);
-        }else{
+        } else {
             throw new IllegalArgumentException("This employee does not exist");
         }
     }
+
     @Override
     public void completed() {
-        if(this.state == true){
+        if (this.state) {
             Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
             this.setEndDate(currentDate);
 
@@ -92,16 +82,13 @@ public class Task extends Operation implements Itask {
 
     @Override
     public boolean isUrgent() {
-        if(this.state){ //if the task is completed it is not urgent
+        if (this.state) { //if the task is completed it is not urgent
             return false;
         }
         Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());//convert currentDate
         System.out.println(currentDate);
         System.out.println(this.getDeadline());
-        if (this.getDeadline() != null && this.getDeadline().after(currentDate)) {
-            return true;
-        }
-        return false;
+        return this.getDeadline() != null && this.getDeadline().after(currentDate);
     }
 
 
@@ -110,12 +97,12 @@ public class Task extends Operation implements Itask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return state == task.state && department == task.department; //i do not check the id of the hashcode.
+        return state == task.state && department == task.department;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id); //hash only after the id.
+        return Objects.hash(state, department, assignedEmployees);
     }
 
     @Override
@@ -123,8 +110,7 @@ public class Task extends Operation implements Itask {
         return "Task{" +
                 "state=" + state +
                 ", department=" + department +
-                ", id=" + id +  " " +
-                 super.toString();
+                super.toString();
 
     }
 }

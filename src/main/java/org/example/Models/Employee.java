@@ -10,20 +10,12 @@ public class Employee extends Person implements Iemployee {
 
     private Departments department;
     private boolean employedStatus = true;
-    private final int id;
-    private static int employeeId = 0; //to be removed when I add the database.
+    private Integer bonus;
     public Employee(String name, int age, String phoneNumber, String email, double salary, String department) {
         super(name, age, phoneNumber, email);
         this.salary = salary;
+        this.bonus = null;
         setDepartment(department);
-        this.id = employeeId++;
-    }
-
-    public int getCurrentEmployeeNumber(){
-        return employeeId;
-    }
-    public int getId(){
-        return this.id;
     }
 
     public double getSalary() {
@@ -36,6 +28,14 @@ public class Employee extends Person implements Iemployee {
 
     public Departments getDepartment() {
         return this.department;
+    }
+
+    public Integer getBonus() {
+        return bonus;
+    }
+
+    public void setBonus(Integer bonus) {
+        this.bonus = bonus;
     }
 
     public void setDepartment(String department) {
@@ -68,7 +68,6 @@ public class Employee extends Person implements Iemployee {
     public String toString() {
         return
                 " salary=" + salary + '\'' +
-                ", id=" + id + '\'' +
                 ", department='" + department + '\'' +
                 ", status=" + this.employedStatus +
                 '\''  +  super.toString();

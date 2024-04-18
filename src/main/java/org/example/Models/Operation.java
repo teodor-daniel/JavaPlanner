@@ -9,7 +9,7 @@ public abstract class Operation {
     private Date endDate;
     private Date deadline;
 
-    private static ArrayList<String> operationNames = new ArrayList<>();
+    private static final ArrayList<String> operationNames = new ArrayList<>();
 
     public Operation(String name, Date startDate, Date endDate, Date deadline) {
         setName(name);

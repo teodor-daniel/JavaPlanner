@@ -6,25 +6,12 @@ import org.example.Interfaces.IteamLead;
 import java.util.ArrayList;
 
 public final class TeamLead extends Employee implements IteamLead {
-
-    private int bonus;
-
     private ArrayList<Employee> subordinates;
-
-    public TeamLead(String name, int age, String phoneNumber, String email, double salary, String department, int Bonus) {
+    public TeamLead(String name, int age, String phoneNumber, String email, double salary, String department, Integer Bonus) {
         super( name, age, phoneNumber, email, salary, department);
-        this.bonus = Bonus;
+        super.setBonus(Bonus);
         this.subordinates = new ArrayList<>();
     }
-
-    public int getBonus() {
-        return bonus;
-    }
-
-    public void setBonus(int bonus) {
-        this.bonus = bonus;
-    }
-
     public ArrayList<Employee> getSubordinates() {
         return subordinates;
     }
@@ -63,7 +50,7 @@ public final class TeamLead extends Employee implements IteamLead {
     @Override
     public String toString() {
         return "TeamLead{" +
-                " yearlyBonus=" + bonus +
+                " yearlyBonus=" + getBonus() +
                 ", subordionates=" + subordinates + super.toString() +
                 '}';
     }

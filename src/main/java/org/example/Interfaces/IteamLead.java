@@ -6,8 +6,8 @@ import org.example.Models.Task;
 
 public interface IteamLead {
 
-    public void fireEmployee(Employee e);
-    public void hireEmployee(Employee e);
-    public void assignEmployee(Employee e, Task t);
+    void fireEmployee(Employee e);
+    void hireEmployee(Employee e);
+    void assignEmployee(Employee e, Task t);
 
 }

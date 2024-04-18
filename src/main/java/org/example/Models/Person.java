@@ -13,9 +13,6 @@ public abstract class Person {
 
     private String email;
 
-    private static List<String> emailList = new ArrayList<>();
-
-    private static List<String> phoneList = new ArrayList<>();
 
 
     public Person(String name, int age, String phoneNumber, String email) {
@@ -46,15 +43,7 @@ public abstract class Person {
     }
 
     public void setPhoneNumber(String phoneNumber) {//to do ragex validation for phone and email.
-        if(!phoneList.contains(phoneNumber)){
-            if(this.phoneNumber != null){
-                phoneList.remove(this.phoneNumber);
-            }
-            this.phoneNumber = phoneNumber;
-            phoneList.add(phoneNumber);
-        }else{
-            throw new IllegalArgumentException("Phone is taken");
-        }
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
@@ -62,15 +51,7 @@ public abstract class Person {
     }
 
     public void setEmail(String email) {
-        if(!emailList.contains(email) ){
-            if(this.email != null){
-                emailList.remove(this.email);
-            }
-            this.email = email;
-            emailList.add(email);
-        }else{
-            throw new IllegalArgumentException("Email is taken");
-        }
+        this.email = email;
 
     }
 
@@ -91,9 +72,9 @@ public abstract class Person {
     public String toString() {
         return
                 ", age=" + age +
-                ", name='" + name + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", email='" + email + '\''
-               ;
+                        ", name='" + name + '\'' +
+                        ", phoneNumber='" + phoneNumber + '\'' +
+                        ", email='" + email + '\''
+                ;
     }
 }

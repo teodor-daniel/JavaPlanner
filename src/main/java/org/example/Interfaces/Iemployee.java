@@ -1,7 +1,7 @@
 package org.example.Interfaces;
 
 public interface Iemployee {
-   public boolean isEmployed();
+   boolean isEmployed();
 
-   public void resign();
+   void resign();
 }

@@ -2,7 +2,7 @@ package org.example.Interfaces;
 
 public interface Itask {
 
-    public void completed();
+    void completed();
 
-    public boolean isUrgent();
+    boolean isUrgent();
 }

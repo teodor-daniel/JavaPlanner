@@ -40,10 +40,13 @@ public class App
 
 
 //            Employee e = new Employee("Teo", 23, "123", "teo@a", 2000, "hr");
-            CRUDemployees cruDemployees =  new CRUDemployees();
-            ArrayList<Employee> employeeArrayList = new ArrayList<>();
-            employeeArrayList.addAll(CRUDemployees.loadAllEmployees(conn));
-            System.out.println(employeeArrayList);
+//            ArrayList<Employee> employeeArrayList = new ArrayList<>(CRUDemployees.loadAllEmployees(conn));
+
+
+//            System.out.println(CRUDemployees.findById(conn, 1));
+            Employee e2 = new Employee("Teoooo", 25, "1244", "teoo@a", 2000, "hr");
+            CRUDemployees.updateEmployee(conn, 1, e2);
+            System.out.println(CRUDemployees.findById(conn, 1));
             //close.
             conn.close();
         } catch (SQLException e) {

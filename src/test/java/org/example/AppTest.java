@@ -1,38 +1,67 @@
 package org.example;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.example.Models.Company;
+import org.example.Private.Sensitive;
+import org.example.Services.CRUDcompany;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
-{
+public class AppTest extends TestCase {
+    private Connection conn;
+
     /**
-     * Create the test case
-     *
-     * @param testName name of the test case
+     * Set up your test environment, database connection, etc.
      */
-    public AppTest( String testName )
-    {
-        super( testName );
+    protected void setUp() throws Exception {
+        super.setUp();
+        // Initialize database connection
+        String url = Sensitive.URL; // Use your test database credentials
+        String user = Sensitive.USER;
+        String password = Sensitive.PASSWORD;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            fail("Error connecting to database: " + e.getMessage());
+        }
     }
 
     /**
-     * @return the suite of tests being tested
+     * Clean up after tests
      */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        // Close the database connection
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                fail("Error closing database connection: " + e.getMessage());
+            }
+        }
     }
 
     /**
-     * Rigourous Test :-)
+     * Test to add and then delete a company
      */
-    public void testApp()
-    {
-        assertTrue( true );
+    public void testAddAndDeleteCompany() {
+        Company newCompany = new Company(1, "TestCompany", "123 Test St", "123456789", "123-456-7890", "test@test.com");
+        CRUDcompany.saveToDataBase(conn, newCompany);
+
+        // Check if company was added
+        Company fetchedCompany = CRUDcompany.findById(conn, 1);
+        assertNotNull("Company should not be null", fetchedCompany);
+
+        // Delete the company
+        CRUDcompany.deleteCompany(conn, 1);
+
+        // Check if company was deleted
+        Company deletedCompany = CRUDcompany.findById(conn, 1);
+        assertNull("Company should be null", deletedCompany);
     }
+
 }

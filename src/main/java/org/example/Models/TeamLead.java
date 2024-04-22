@@ -7,10 +7,26 @@ import java.util.ArrayList;
 
 public final class TeamLead extends Employee implements IteamLead {
     private ArrayList<Employee> subordinates;
-    public TeamLead(String name, int age, String phoneNumber, String email, double salary, String department, Integer Bonus) {
-        super( name, age, phoneNumber, email, salary, department);
+
+    public TeamLead(int id, String name, int age, String phoneNumber, String email, double salary, String department, Integer Bonus, Integer team_lead_id,Integer company_id) {
+        super(id,name, age, phoneNumber, email, salary, department, team_lead_id, company_id);
+    }
+    public TeamLead(int id ,String name, int age, String phoneNumber, String email, double salary, String department, Integer Bonus) {
+        super(id,name, age, phoneNumber, email, salary, department);
         super.setBonus(Bonus);
         this.subordinates = new ArrayList<>();
+    }
+    public TeamLead(String name, int age, String phoneNumber, String email, double salary, String department, Integer Bonus) {
+        super(name, age, phoneNumber, email, salary, department);
+        super.setBonus(Bonus);
+        this.subordinates = new ArrayList<>();
+    }
+
+    public static boolean isTeamLead(Employee e){
+        if(e.getTeamLeadId() == e.getId()){
+            return true;
+        }
+        return false;
     }
     public ArrayList<Employee> getSubordinates() {
         return subordinates;
@@ -35,6 +51,7 @@ public final class TeamLead extends Employee implements IteamLead {
         if(e == null){
             throw  new IllegalArgumentException("Employee is null");
         }
+        e.setTeamLeadId(this.getId());
         this.subordinates.add(e);
     }
 

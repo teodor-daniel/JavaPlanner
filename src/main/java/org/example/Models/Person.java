@@ -14,7 +14,6 @@ public abstract class Person {
     private String email;
 
 
-
     public Person(String name, int age, String phoneNumber, String email) {
         this.age = age;
         this.name = name;

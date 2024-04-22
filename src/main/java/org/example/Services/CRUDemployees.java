@@ -12,6 +12,21 @@ import java.util.List;
 public class CRUDemployees {
     //Save to
     public static void saveToDatabase(Connection conn, Employee employee) throws SQLException {
+        String sql = "INSERT INTO employees (id, name, age, phone_number, email, salary, department, employed_status) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, employee.getId());
+            pstmt.setString(2, employee.getName());
+            pstmt.setInt(3, employee.getAge());
+            pstmt.setString(4, employee.getPhoneNumber());
+            pstmt.setString(5, employee.getEmail());
+            pstmt.setDouble(6, employee.getSalary());
+            pstmt.setString(7, employee.getDepartment().name());
+            pstmt.setBoolean(8, employee.isEmployed());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public static void saveToDataBaseNoId(Connection conn, Employee employee) {
         String sql = "INSERT INTO employees (name, age, phone_number, email, salary, department, employed_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, employee.getName());
@@ -22,9 +37,10 @@ public class CRUDemployees {
             pstmt.setString(6, employee.getDepartment().name());
             pstmt.setBoolean(7, employee.isEmployed());
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
-
     public static List<Employee> loadAllEmployees(Connection conn) throws SQLException {
         List<Employee> employees = new ArrayList<>();
         String sql = "SELECT * FROM employees";
@@ -32,6 +48,7 @@ public class CRUDemployees {
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Employee employee = new Employee(
+                        rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("age"),
                         rs.getString("phone_number"),
@@ -46,27 +63,28 @@ public class CRUDemployees {
         }
         return employees;
     }
-
-    public static void showAllEmployees(Connection conn) throws SQLException {
-        List<Employee> employees = new ArrayList<>();
-        String sql = "SELECT * FROM employees";
-        try (PreparedStatement psmt = conn.prepareStatement(sql);
-             ResultSet rs = psmt.executeQuery()) {
-            while (rs.next()) {
-                Employee employee = new Employee(
-                        rs.getString("name"),
-                        rs.getInt("age"),
-                        rs.getString("phone_number"),
-                        rs.getString("email"),
-                        rs.getDouble("salary"),
-                        rs.getString("department")
-                );
-                employee.setEmployedStatus(rs.getBoolean("employed_status"));
-                employees.add(employee);
-            }
-        }
-        System.out.println(employees);
-    }
+// There is no reason to do this as i have a list of all the employees.
+//    public static void showAllEmployees(Connection conn) throws SQLException {
+//        List<Employee> employees = new ArrayList<>();
+//        String sql = "SELECT * FROM employees";
+//        try (PreparedStatement psmt = conn.prepareStatement(sql);
+//             ResultSet rs = psmt.executeQuery()) {
+//            while (rs.next()) {
+//                Employee employee = new Employee(
+//                        rs.getInt("id"),
+//                        rs.getString("name"),
+//                        rs.getInt("age"),
+//                        rs.getString("phone_number"),
+//                        rs.getString("email"),
+//                        rs.getDouble("salary"),
+//                        rs.getString("department")
+//                );
+//                employee.setEmployedStatus(rs.getBoolean("employed_status"));
+//                employees.add(employee);
+//            }
+//        }
+//        System.out.println(employees);
+//    }
 
     public static Employee findById(Connection conn, Integer id) throws SQLException {
         String sql = "SELECT * FROM employees WHERE id = ?";
@@ -76,6 +94,7 @@ public class CRUDemployees {
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs.next()) {
                     Employee employee = new Employee(
+                            rs.getInt("id"),
                             rs.getString("name"),
                             rs.getInt("age"),
                             rs.getString("phone_number"),

@@ -1,10 +1,8 @@
 package org.example;
 
-import org.example.Models.Employee;
-import org.example.Models.Project;
-import org.example.Models.Task;
-import org.example.Models.TeamLead;
+import org.example.Models.*;
 import org.example.Private.Sensitive;
+import org.example.Services.CRUDcompany;
 import org.example.Services.CRUDemployees;
 import org.example.Services.SalaryComparator;
 
@@ -37,17 +35,16 @@ public class App
             conn = DriverManager.getConnection(url, user, password);
 
             System.out.println("Connected to the PostgreSQL server successfully.");
+            //Testing CRUDS:
+            Company c1 = new Company("Company1", "Address1", "123456789", "123-456-7890", "email@ceva");
 
+            CRUDcompany.loadAllCompanies(conn).forEach(System.out::println);
 
-//            Employee e = new Employee("Teo", 23, "123", "teo@a", 2000, "hr");
-//            ArrayList<Employee> employeeArrayList = new ArrayList<>(CRUDemployees.loadAllEmployees(conn));
-
-
-//            System.out.println(CRUDemployees.findById(conn, 1));
-            Employee e2 = new Employee("Teoooo", 25, "1244", "teoo@a", 2000, "hr");
-            CRUDemployees.updateEmployee(conn, 1, e2);
-            System.out.println(CRUDemployees.findById(conn, 1));
-            //close.
+            CRUDcompany.deleteCompany(conn, 1);
+            if(CRUDcompany.findById(conn, 1) == null){
+                System.out.println("Company deleted successfully");
+            }
+            //
             conn.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -62,31 +59,6 @@ public class App
                 System.out.println(ex.getMessage());
             }
         }
-//
-//        Employee e = new Employee("Teo", 23, "123", "teo@a", 2000, "hr");
-//        TeamLead t = new TeamLead("Teoo", 24, "234", "teoo@a",  2500,"hr", 2000000);
-//        t.hireEmployee(e);
-//        t.hireEmployee(new Employee("Alice", 30, "123-456-7890", "alice@example.com", 50000, "IT"));
-//        Collections.sort(t.getSubordinates(), new SalaryComparator());
-//        System.out.println(t.getSubordinates());
-//        Calendar futureDate = Calendar.getInstance();
-//        futureDate.add(Calendar.DAY_OF_MONTH, 10); // 10 days from now
-//        Task futureTask = new Task("Future Task", futureDate.getTime(), "hr");
-//        System.out.println("ID: " + futureTask.getId() + ", Is Urgent: " + futureTask.isUrgent());
-//
-//        Calendar pastDate = Calendar.getInstance();
-//        pastDate.add(Calendar.DAY_OF_MONTH, -10);
-//        Task pastTask = new Task("Past Task", pastDate.getTime(), "it");
-//        System.out.println("Test Case 2 - Task ID: " + pastTask.getId() + ", Is Urgent: " + pastTask.isUrgent());
-//
-//        Date startDate = new Date();
-//        Date endDate = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-//        Date deadline = new Date(startDate.getTime() + 14 * 24 * 60 * 60 * 1000);
-//
-//        Project project = new Project("New Project", startDate, endDate, deadline, "IT", "IN_PROGRESS", 100000, t);
-//        project.addTask(pastTask);
-//        project.addTask(futureTask);
-//        System.out.println(project);
 
     }
 }

@@ -1,116 +1,93 @@
 package org.example.Models;
 
+import java.sql.Date;
 
-import org.example.Enum.Departments;
-import org.example.Interfaces.Itask;
+public class Task {
+    private int id;
+    private String name;
+    private String description;
+    private int assignedTo;
+    private int projectId;
+    private Date dueDate;
+    private String status;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Objects;
-
-public class Task extends Operation implements Itask {
-
-    private boolean state = false; //when a task is created it is false by default
-
-    private Departments department;
-
-
-    private ArrayList<Employee> assignedEmployees;
-
-    public Task(String name, Date startDate, Date endDate, Date deadline, String department) {
-        super(name, startDate, endDate, deadline);
-        setDepartment(department);
-        this.assignedEmployees = new ArrayList<>();
+    public Task(int id, String name, String description, int assignedTo, int projectId, Date dueDate, String status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.assignedTo = assignedTo;
+        this.projectId = projectId;
+        this.dueDate = dueDate;
+        this.status = status;
     }
 
-
-    public Task(String name, Date deadLine, String department) {
-        super(name, deadLine);
-        setDepartment(department);
+    // Getters and Setters
+    public int getId() {
+        return id;
     }
 
-    public boolean isState() {
-        return state;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public String getName() {
+        return name;
     }
 
-    public Departments getDepartment() {
-        return department;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setDepartment(String department) {
-        try {
-            this.department = Departments.valueOf(department.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid department");
-        }
+    public String getDescription() {
+        return description;
     }
 
-    public ArrayList<Employee> getAssignedEmployees() {
-        return assignedEmployees;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public void setAssignedEmployees(ArrayList<Employee> assignedEmployees) {
-        this.assignedEmployees = assignedEmployees;
+    public int getAssignedTo() {
+        return assignedTo;
     }
 
-    public void addAssignedEmployees(Employee employee) {
-        this.assignedEmployees.add(employee);
+    public void setAssignedTo(int assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
-    public void removeAssignedEmployees(Employee employee) {
-        if (this.assignedEmployees.contains(employee)) {
-            this.assignedEmployees.remove(employee);
-        } else {
-            throw new IllegalArgumentException("This employee does not exist");
-        }
+    public int getProjectId() {
+        return projectId;
     }
 
-    @Override
-    public void completed() {
-        if (this.state) {
-            Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            this.setEndDate(currentDate);
-
-        }
+    public void setProjectId(int projectId) {
+        this.projectId = projectId;
     }
 
-    @Override
-    public boolean isUrgent() {
-        if (this.state) { //if the task is completed it is not urgent
-            return false;
-        }
-        Date currentDate = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());//convert currentDate
-        System.out.println(currentDate);
-        System.out.println(this.getDeadline());
-        return this.getDeadline() != null && this.getDeadline().after(currentDate);
+    public Date getDueDate() {
+        return dueDate;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return state == task.state && department == task.department;
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(state, department, assignedEmployees);
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
     public String toString() {
         return "Task{" +
-                "state=" + state +
-                ", department=" + department +
-                super.toString();
-
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", assignedTo=" + assignedTo +
+                ", projectId=" + projectId +
+                ", dueDate=" + dueDate +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

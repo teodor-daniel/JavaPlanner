@@ -1,5 +1,7 @@
 package org.example.Services;
 
+import org.example.Interfaces.CrudRepository;
+import org.example.Models.Department;
 import org.example.Models.Employee;
 
 import java.sql.Connection;
@@ -8,45 +10,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class CRUDemployees {
-    //Save to
-    public static void saveToDatabase(Connection conn, Employee employee) throws SQLException {
-        String sql = "INSERT INTO employees (id, name, age, phone_number, email, salary, department, employed_status) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, employee.getId());
-            pstmt.setString(2, employee.getName());
-            pstmt.setInt(3, employee.getAge());
-            pstmt.setString(4, employee.getPhoneNumber());
-            pstmt.setString(5, employee.getEmail());
-            pstmt.setDouble(6, employee.getSalary());
-            pstmt.setString(7, employee.getDepartment().name());
-            pstmt.setBoolean(8, employee.isEmployed());
-            pstmt.executeUpdate();
-        }
-    }
+public class CRUDemployees implements CrudRepository<Employee, Integer> {
 
-    public static void saveToDataBaseNoId(Connection conn, Employee employee) {
-        String sql = "INSERT INTO employees (name, age, phone_number, email, salary, department, employed_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    @Override
+    public void save(Connection conn, Employee employee) {
+        String sql = "INSERT INTO employees (name, age, phone_number, email, salary, department_id, employed_status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, employee.getName());
             pstmt.setInt(2, employee.getAge());
             pstmt.setString(3, employee.getPhoneNumber());
             pstmt.setString(4, employee.getEmail());
             pstmt.setDouble(5, employee.getSalary());
-            pstmt.setString(6, employee.getDepartment().name());
+            pstmt.setInt(6, employee.getDepartment().getId());
             pstmt.setBoolean(7, employee.isEmployed());
             pstmt.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Error saving employee to database");
             e.printStackTrace();
         }
     }
-    public static List<Employee> loadAllEmployees(Connection conn) throws SQLException {
+
+    @Override
+    public List<Employee> findAll(Connection conn) {
         List<Employee> employees = new ArrayList<>();
         String sql = "SELECT * FROM employees";
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
+                Department department = new Department(rs.getInt("department_id"), null, 0);
                 Employee employee = new Employee(
                         rs.getInt("id"),
                         rs.getString("name"),
@@ -54,94 +47,73 @@ public class CRUDemployees {
                         rs.getString("phone_number"),
                         rs.getString("email"),
                         rs.getDouble("salary"),
-                        rs.getString("department")
+                        department
                 );
                 employee.setEmployedStatus(rs.getBoolean("employed_status"));
-
                 employees.add(employee);
             }
+        } catch (SQLException e) {
+            System.out.println("Error loading employees from database");
+            e.printStackTrace();
         }
         return employees;
     }
-// There is no reason to do this as i have a list of all the employees.
-//    public static void showAllEmployees(Connection conn) throws SQLException {
-//        List<Employee> employees = new ArrayList<>();
-//        String sql = "SELECT * FROM employees";
-//        try (PreparedStatement psmt = conn.prepareStatement(sql);
-//             ResultSet rs = psmt.executeQuery()) {
-//            while (rs.next()) {
-//                Employee employee = new Employee(
-//                        rs.getInt("id"),
-//                        rs.getString("name"),
-//                        rs.getInt("age"),
-//                        rs.getString("phone_number"),
-//                        rs.getString("email"),
-//                        rs.getDouble("salary"),
-//                        rs.getString("department")
-//                );
-//                employee.setEmployedStatus(rs.getBoolean("employed_status"));
-//                employees.add(employee);
-//            }
-//        }
-//        System.out.println(employees);
-//    }
 
-    public static Employee findById(Connection conn, Integer id) throws SQLException {
+    @Override
+    public Optional<Employee> findById(Connection conn, Integer id){
         String sql = "SELECT * FROM employees WHERE id = ?";
-        System.out.println("Searching for employee with id: " + id);
-        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
-            pstm.setInt(1, id);
-            try (ResultSet rs = pstm.executeQuery()) {
-                if (rs.next()) {
-                    Employee employee = new Employee(
-                            rs.getInt("id"),
-                            rs.getString("name"),
-                            rs.getInt("age"),
-                            rs.getString("phone_number"),
-                            rs.getString("email"),
-                            rs.getDouble("salary"),
-                            rs.getString("department")
-                    );
-                    employee.setEmployedStatus(rs.getBoolean("employed_status"));
-                    return employee;
-                }
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Department department = new Department(rs.getInt("department_id"), null, 0);
+                Employee employee = new Employee(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("age"),
+                        rs.getString("phone_number"),
+                        rs.getString("email"),
+                        rs.getDouble("salary"),
+                        department
+                );
+                employee.setEmployedStatus(rs.getBoolean("employed_status"));
+                return Optional.of(employee);
             }
+        } catch (SQLException e) {
+            System.out.println("Error finding employee by id");
+            e.printStackTrace();
         }
-        System.out.println("Not found");
-        return null;
+        return Optional.empty();
     }
 
-    //update the employee with the new employee data in the database using the id of the employee
-    public static void updateEmployee(Connection conn, Integer id, Employee newEmployee) throws SQLException{
-        Employee currentEmployee = findById(conn, id);
-        if (currentEmployee == null) {
-            System.out.println("Employee not found");
-            return;
-        }
-        System.out.println("Employee found");
-        System.out.println(newEmployee);
-        System.out.println(currentEmployee);
-        String sql = "UPDATE employees SET name = ?, age = ?, phone_number = ?, email = ?, salary = ?, department = ?, employed_status = ? WHERE id = ?";
+    @Override
+    public void update(Connection conn, Employee employee){
+        String sql = "UPDATE employees SET name = ?, age = ?, phone_number = ?, email = ?, salary = ?, department_id = ?, employed_status = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, newEmployee.getName());
-            pstmt.setInt(2, newEmployee.getAge());
-            pstmt.setString(3, newEmployee.getPhoneNumber());
-            pstmt.setString(4, newEmployee.getEmail());
-            pstmt.setDouble(5, newEmployee.getSalary());
-            pstmt.setString(6, newEmployee.getDepartment().name());
-            pstmt.setBoolean(7, newEmployee.isEmployed());
-            pstmt.setInt(8, id);
+            pstmt.setString(1, employee.getName());
+            pstmt.setInt(2, employee.getAge());
+            pstmt.setString(3, employee.getPhoneNumber());
+            pstmt.setString(4, employee.getEmail());
+            pstmt.setDouble(5, employee.getSalary());
+            pstmt.setInt(6, employee.getDepartment().getId());  // Now referencing department_id
+            pstmt.setBoolean(7, employee.isEmployed());
+            pstmt.setInt(8, employee.getId());
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error updating employee in database");
+            e.printStackTrace();
         }
     }
-    //Delete employee from the database using the id of the employee
-    public static void deleteEmployee(Connection conn, Integer id) throws SQLException {
+
+    @Override
+    public void deleteById(Connection conn, Integer id) {
         String sql = "DELETE FROM employees WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error deleting employee from database");
+            e.printStackTrace();
         }
     }
-
-
 }

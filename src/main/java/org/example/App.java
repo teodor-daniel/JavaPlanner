@@ -33,15 +33,15 @@ public class App
             String password = Sensitive.PASSWORD;
 
             conn = DriverManager.getConnection(url, user, password);
-
+            CRUDcompany crudCompany = new CRUDcompany();
             System.out.println("Connected to the PostgreSQL server successfully.");
             //Testing CRUDS:
             Company c1 = new Company("Company1", "Address1", "123456789", "123-456-7890", "email@ceva");
 
-            CRUDcompany.loadAllCompanies(conn).forEach(System.out::println);
+            crudCompany.findAll(conn).forEach(System.out::println);
 
-            CRUDcompany.deleteCompany(conn, 1);
-            if(CRUDcompany.findById(conn, 1) == null){
+            crudCompany.deleteById(conn, 1);
+            if(!crudCompany.findById(conn, 1).isPresent()){
                 System.out.println("Company deleted successfully");
             }
             //

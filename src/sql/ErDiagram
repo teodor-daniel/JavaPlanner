@@ -1,0 +1,37 @@
++------------+   +---------------+   +--------------+
+| Company    |   | Department    |   | Employee     |
+|------------|   |---------------|   |--------------|
+| company_id |---| department_id |---| employee_id  |
+| name       |   | name          |   | name         |
+| address    |   | company_id    |-->| email        |
+| phone      |   | manager_id    |   | phone_number |
+| email      |   +---------------+   | salary       |
++------------+                       | department_id|
+                                     | company_id   |
+                                     | team_lead_id |
+                                     +--------------+
+                                            ^
+                                            |
++--------------+   +--------------+         |
+| Project      |   | Task         |         |
+|--------------|   |--------------|         |
+| project_id   |---| task_id      |---------|
+| name         |   | project_id   |
+| start_date   |   | assigned_to  |
+| end_date     |   | description  |
+| status       |   | status       |
+| department_id|   | due_date     |
+| lead_id      |   +--------------+
++--------------+           |
+                           |
++--------------+           |
+| TimeLog      |           |
+|--------------|           |
+| timelog_id   |-----------+
+| task_id      |
+| employee_id  |
+| hours_logged |
+| log_date     |
+| description  |
++--------------+
+

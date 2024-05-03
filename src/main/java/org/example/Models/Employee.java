@@ -1,44 +1,55 @@
 package org.example.Models;
 
-
-import org.example.Enum.Departments;
 import org.example.Interfaces.Iemployee;
 
-public class Employee extends Person implements Iemployee {
+public class Employee extends PersonA implements Iemployee {
 
     private int id;
     private double salary;
-    private Departments department;
+    private Department department;  // Changed from Departments enum to Department object
     private boolean employedStatus = true;
     private Integer bonus;
     private Integer teamLeadId;
     private Integer company_id;
 
-    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, String department, int teamLeadId, int company_id) {
+    // Constructors
+    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Department department, int teamLeadId, int company_id) {
         super(name, age, phoneNumber, email);
         this.id = id;
         this.salary = salary;
         this.bonus = null;
-        setDepartment(department);
+        this.department = department;
         this.teamLeadId = teamLeadId;
         this.company_id = company_id;
     }
-    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, String department) {
+
+    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Department department) {
         super(name, age, phoneNumber, email);
         this.id = id;
         this.salary = salary;
         this.bonus = null;
-        setDepartment(department);
+        this.department = department;
         this.teamLeadId = null;
         this.company_id = null;
     }
 
-    public Employee(String name, int age, String phoneNumber, String email, double salary, String department) {
+    public Employee(String name, int age, String phoneNumber, String email, double salary, Department department, int teamLeadId, int company_id) {
         super(name, age, phoneNumber, email);
         this.salary = salary;
         this.bonus = null;
-        setDepartment(department);
+        this.department = department;
+        this.teamLeadId = teamLeadId;
+        this.company_id = company_id;
     }
+
+    public Employee(String name, int age, String phoneNumber, String email, double salary, Department department) {
+        super(name, age, phoneNumber, email);
+        this.salary = salary;
+        this.bonus = null;
+        this.department = department;
+    }
+
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -55,8 +66,12 @@ public class Employee extends Person implements Iemployee {
         this.salary = salary;
     }
 
-    public Departments getDepartment() {
-        return this.department;
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 
     public Integer getBonus() {
@@ -65,14 +80,6 @@ public class Employee extends Person implements Iemployee {
 
     public void setBonus(Integer bonus) {
         this.bonus = bonus;
-    }
-
-    public void setDepartment(String department) {
-        try {
-            this.department = Departments.valueOf(department.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid department");
-        }
     }
 
     public boolean isEmployedStatus() {
@@ -101,7 +108,7 @@ public class Employee extends Person implements Iemployee {
 
     @Override
     public boolean isEmployed() {
-        return this.employedStatus;
+        return employedStatus;
     }
 
     @Override
@@ -111,14 +118,14 @@ public class Employee extends Person implements Iemployee {
 
     @Override
     public String toString() {
-        return  "id=" + id +
-                " salary=" + salary + '\'' +
-                ", department='" + department + '\'' +
-                ", status=" + this.employedStatus +
+        return "Employee{" +
+                "id=" + id +
+                ", salary=" + salary +
+                ", department=" + (department != null ? department.getName() : "No department") +
+                ", employedStatus=" + employedStatus +
                 ", bonus=" + bonus +
                 ", teamLeadId=" + teamLeadId +
                 ", company_id=" + company_id +
-                '\''  +  super.toString();
-
+                "} " + super.toString();
     }
 }

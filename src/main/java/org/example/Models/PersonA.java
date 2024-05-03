@@ -1,10 +1,8 @@
 package org.example.Models;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-public abstract class Person {
+public abstract class PersonA {
     private int age;
 
     private String name;
@@ -14,7 +12,7 @@ public abstract class Person {
     private String email;
 
 
-    public Person(String name, int age, String phoneNumber, String email) {
+    public PersonA(String name, int age, String phoneNumber, String email) {
         this.age = age;
         this.name = name;
         setPhoneNumber(phoneNumber);
@@ -58,7 +56,7 @@ public abstract class Person {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Person person = (Person) o;
+        PersonA person = (PersonA) o;
         return age == person.age && Objects.equals(name, person.name) && Objects.equals(phoneNumber, person.phoneNumber) && Objects.equals(email, person.email);
     }
 

@@ -18,6 +18,8 @@ CREATE TABLE departments (
                              id SERIAL PRIMARY KEY,
                              name VARCHAR(255) NOT NULL,
                              company_id INTEGER NOT NULL,
+                             manager_id INTEGER NOT NULL,
+                             FOREIGN KEY (manager_id) REFERENCES employees(id) ON DELETE CASCADE,
                              FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE
 );
 

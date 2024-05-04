@@ -2,16 +2,14 @@ package org.example;
 
 import junit.framework.TestCase;
 import org.example.Models.Company;
-import org.example.Models.Employee;
 import org.example.Private.Sensitive;
-import org.example.Services.CRUDcompany;
-import org.example.Services.CRUDemployees;
+import org.example.Crud.CRUDcompany;
+import org.example.Crud.CRUDemployees;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Optional;
 
 /**
  * Unit test for simple App.

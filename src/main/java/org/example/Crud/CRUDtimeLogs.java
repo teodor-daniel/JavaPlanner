@@ -1,4 +1,4 @@
-package org.example.Services;
+package org.example.Crud;
 
 import org.example.Interfaces.CrudRepository;
 import org.example.Models.TimeLog;

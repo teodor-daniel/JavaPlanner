@@ -18,7 +18,7 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
         String sql = "INSERT INTO projects (name, lead_id, status, department_id, budget) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, project.getName());
-            pstmt.setInt(2, project.getDepartmentId()); // Assuming lead_id corresponds to the department head or similar
+            pstmt.setInt(2, project.getTeamLead());
             pstmt.setString(3, project.getStatus());
             pstmt.setInt(4, project.getDepartmentId());
             pstmt.setDouble(5, project.getBudget());
@@ -33,14 +33,16 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
     public List<Project> findAll(Connection conn) {
         List<Project> projects = new ArrayList<>();
         String sql = "SELECT * FROM projects";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Project project = new Project(
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("status"),
                         rs.getDouble("budget"),
-                        rs.getInt("department_id")
+                        rs.getInt("department_id"),
+                        rs.getInt("lead_id")
                 );
                 projects.add(project);
             }
@@ -63,7 +65,8 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
                         rs.getString("name"),
                         rs.getString("status"),
                         rs.getDouble("budget"),
-                        rs.getInt("department_id")
+                        rs.getInt("department_id"),
+                        rs.getInt("lead_id")
                 );
                 return Optional.of(project);
             }
@@ -79,7 +82,7 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
         String sql = "UPDATE projects SET name = ?, lead_id = ?, status = ?, department_id = ?, budget = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, project.getName());
-            pstmt.setInt(2, project.getDepartmentId()); // Update this if lead_id should be different
+            pstmt.setInt(2, project.getTeamLead());
             pstmt.setString(3, project.getStatus());
             pstmt.setInt(4, project.getDepartmentId());
             pstmt.setDouble(5, project.getBudget());

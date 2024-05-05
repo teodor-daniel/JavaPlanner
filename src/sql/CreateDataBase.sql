@@ -18,7 +18,7 @@ CREATE TABLE departments (
                              id SERIAL PRIMARY KEY,
                              name VARCHAR(255) NOT NULL,
                              company_id INTEGER NOT NULL,
-                             manager_id INTEGER NOT NULL,
+                             manager_id INTEGER,
                              FOREIGN KEY (manager_id) REFERENCES employees(id) ON DELETE CASCADE,
                              FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE
 );
@@ -32,9 +32,9 @@ CREATE TABLE employees (
                            email VARCHAR(255) UNIQUE,
                            salary DOUBLE PRECISION,
                            department_id INTEGER NOT NULL,
-                           employed_status BOOLEAN DEFAULT TRUE,
+                           employed_status VARCHAR(255) NOT NULL,
                            bonus INT DEFAULT NULL,
-                           team_lead_id INTEGER NULL,
+                           team_lead_id INTEGER DEFAULT NULL,
                            company_id INTEGER NOT NULL,
                            FOREIGN KEY (team_lead_id) REFERENCES employees(id) ON DELETE SET NULL,
                            FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE,
@@ -57,10 +57,10 @@ CREATE TABLE tasks (
                        id SERIAL PRIMARY KEY,
                        name VARCHAR(255) NOT NULL,
                        description TEXT,
-                       assigned_to INTEGER NOT NULL,
-                       project_id INTEGER NOT NULL,
+                       assigned_to INTEGER,
+                       project_id INTEGER,
                        due_date DATE,
-                       status VARCHAR(50),
+                       status VARCHAR(50) NOT NULL,
                        FOREIGN KEY (assigned_to) REFERENCES employees(id) ON DELETE SET NULL,
                        FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
 );

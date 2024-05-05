@@ -6,12 +6,12 @@ public class Task {
     private int id;
     private String name;
     private String description;
-    private int assignedTo;
-    private int projectId;
+    private Integer assignedTo;
+    private Integer projectId;
     private Date dueDate;
     private String status;
 
-    public Task(int id, String name, String description, int assignedTo, int projectId, Date dueDate, String status) {
+    public Task(int id, String name, String description, Integer assignedTo, Integer projectId, Date dueDate, String status) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -21,7 +21,15 @@ public class Task {
         this.status = status;
     }
 
-    // Getters and Setters
+    public Task(String name, String description, Integer assignedTo, Integer projectId, Date dueDate, String status) {
+        this.name = name;
+        this.description = description;
+        this.assignedTo = assignedTo;
+        this.projectId = projectId;
+        this.dueDate = dueDate;
+        this.status = status;
+    }
+
     public int getId() {
         return id;
     }

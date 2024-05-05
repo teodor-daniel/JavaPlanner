@@ -7,6 +7,9 @@
 | phone      |   | manager_id    |   | phone_number |
 | email      |   +---------------+   | salary       |
 +------------+                       | department_id|
+                                     | age          |
+                                     | bonus        |
+                                     | status       |
                                      | company_id   |
                                      | team_lead_id |
                                      +--------------+

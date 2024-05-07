@@ -3,29 +3,60 @@ package org.example.SwingComponents;
 import org.example.Private.Sensitive;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.List;
 
 public class MainPage extends JFrame {
     private Connection conn;
 
     public MainPage() {
         initDBConnection();
-        setTitle("Database Viewer");
-        setSize(400, 300);
+        setTitle("Database Management");
+        setSize(600, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(1, 1));
+
+        JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
+        Dimension buttonSize = new Dimension(100, 30);
 
         JButton companyButton = new JButton("Company");
+        companyButton.setPreferredSize(buttonSize);
         companyButton.addActionListener(new CompanyButtonClickListener());
-        add(companyButton);
+        navbarPanel.add(companyButton);
+
+        JButton departmentButton = new JButton("Department");
+        departmentButton.setPreferredSize(buttonSize);
+        departmentButton.addActionListener(new DepartmentButtonClickListener());
+        navbarPanel.add(departmentButton);
+
+//        JButton employeeButton = new JButton("Employee");
+//        employeeButton.setPreferredSize(buttonSize);
+//        employeeButton.addActionListener(new EmployeeButtonClickListener());
+//        navbarPanel.add(employeeButton);
+//
+//        JButton projectButton = new JButton("Project");
+//        projectButton.setPreferredSize(buttonSize);
+//        projectButton.addActionListener(new ProjectButtonClickListener());
+//        navbarPanel.add(projectButton);
+//
+//        JButton taskButton = new JButton("Task");
+//        taskButton.setPreferredSize(buttonSize);
+//        taskButton.addActionListener(new TaskButtonClickListener());
+//        navbarPanel.add(taskButton);
+//
+//        JButton timelogButton = new JButton("Time Log");
+//        timelogButton.setPreferredSize(buttonSize);
+//        timelogButton.addActionListener(new TimeLogButtonClickListener());
+//        navbarPanel.add(timelogButton);
+
+        // Add the navbar panel to the main frame
+        add(navbarPanel);
     }
 
+    // Initialize the database connection
     private void initDBConnection() {
         try {
             Class.forName("org.postgresql.Driver");
@@ -49,6 +80,46 @@ public class MainPage extends JFrame {
             MainPage.this.setVisible(false);
         }
     }
+
+    private class DepartmentButtonClickListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new DepartmentScreen(conn, MainPage.this).setVisible(true);
+            MainPage.this.setVisible(false);
+        }
+    }
+
+//    private class EmployeeButtonClickListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new EmployeeScreen(conn, MainPage.this).setVisible(true);
+//            MainPage.this.setVisible(false);
+//        }
+//    }
+//
+//    private class ProjectButtonClickListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new ProjectScreen(conn, MainPage.this).setVisible(true);
+//            MainPage.this.setVisible(false);
+//        }
+//    }
+//
+//    private class TaskButtonClickListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new TaskScreen(conn, MainPage.this).setVisible(true);
+//            MainPage.this.setVisible(false);
+//        }
+//    }
+//
+//    private class TimeLogButtonClickListener implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            new TimeLogScreen(conn, MainPage.this).setVisible(true);
+//            MainPage.this.setVisible(false);
+//        }
+//    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

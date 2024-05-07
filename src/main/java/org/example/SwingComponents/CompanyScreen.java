@@ -16,6 +16,7 @@ import java.sql.Connection;
 class CompanyScreen extends JFrame {
     private JTable companyTable;
     private Connection conn;
+    private JFrame mainPage;
     private final CompanyService companyService;
 
     public CompanyScreen(Connection conn, JFrame mainPage) {

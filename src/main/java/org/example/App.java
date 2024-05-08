@@ -27,12 +27,13 @@ public class App
 
             conn = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the PostgreSQL server successfully.");
+            addTestEmployee(conn);
+
             //Testing CRUDS:
             //addTestCompany(conn);
             //addTestDepartment(conn);
-            //addTestEmployee(conn);
-            //addTestProject(conn);
-            //addTestTask(conn);
+//            addTestProject(conn);
+//            addTestTask(conn);
             addTestTimeLog(conn);
             conn.close();
         } catch (SQLException e) {
@@ -146,8 +147,8 @@ public class App
 
         CRUDdepartments crudDepartments = new CRUDdepartments();
         CRUDemployees crudEmployees = new CRUDemployees();
-        Optional<Department> optionalDepartment = crudDepartments.findById(conn, 5);
-        Optional<Employee> optionalLead = crudEmployees.findById(conn, 4);
+        Optional<Department> optionalDepartment = crudDepartments.findById(conn, 1);
+        Optional<Employee> optionalLead = crudEmployees.findById(conn, 1);
 
         if (optionalDepartment.isPresent() && optionalLead.isPresent()) {
             Department existingDepartment = optionalDepartment.get();
@@ -191,7 +192,7 @@ public class App
         TaskService taskService = new TaskService(crudTasks, taskValidationService);
 
         CRUDemployees crudEmployees = new CRUDemployees();
-        Optional<Employee> optionalEmployee = crudEmployees.findById(conn, 4);
+        Optional<Employee> optionalEmployee = crudEmployees.findById(conn, 1);
 
         CRUDprojects crudProjects = new CRUDprojects();
         Optional<Project> optionalProject = crudProjects.findById(conn, 1);
@@ -202,10 +203,11 @@ public class App
             Task newTask = new Task(
                     "Initial Development Phase",
                     "Develop the core modules for the project",
-                    assignedEmployee.getId(),
-                    associatedProject.getId(),
                     Date.valueOf("2024-06-30"),
-                    "In Progress"
+                    "In Progress",
+                    assignedEmployee.getId(),
+                    associatedProject.getId()
+
             );
 
             taskService.addTask(conn, newTask);
@@ -239,13 +241,12 @@ public class App
 
         TimeLog newTimeLog = new TimeLog(
                 1,
-                4,
+                1,
                 8.0,
                 java.sql.Date.valueOf("2024-05-04"),
                 "Worked on feature implementation"
         );
 
-        // Add the time log to the database
         timeLogService.addTimeLog(conn, newTimeLog);
         System.out.println("Time log added successfully.");
 

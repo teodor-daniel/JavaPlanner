@@ -15,14 +15,15 @@ public class CRUDtasks implements CrudRepository<Task, Integer> {
 
     @Override
     public void save(Connection conn, Task task) {
-        String sql = "INSERT INTO tasks (name, description, assigned_to, project_id, due_date, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tasks (name, description, due_date, status,assigned_to, project_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, task.getName());
             pstmt.setString(2, task.getDescription());
-            pstmt.setInt(3, task.getAssignedTo());
-            pstmt.setInt(4, task.getProjectId());
-            pstmt.setDate(5, task.getDueDate());
-            pstmt.setString(6, task.getStatus());
+            pstmt.setDate(3, task.getDueDate());
+            pstmt.setString(4, task.getStatus());
+            pstmt.setInt(5, task.getAssignedTo());
+            pstmt.setInt(6, task.getProjectId());
+
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error saving task to database");
@@ -40,10 +41,10 @@ public class CRUDtasks implements CrudRepository<Task, Integer> {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("description"),
-                        rs.getInt("assigned_to"),
-                        rs.getInt("project_id"),
                         rs.getDate("due_date"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getInt("assigned_to"),
+                        rs.getInt("project_id")
                 );
                 tasks.add(task);
             }
@@ -65,10 +66,10 @@ public class CRUDtasks implements CrudRepository<Task, Integer> {
                         rs.getInt("id"),
                         rs.getString("name"),
                         rs.getString("description"),
-                        rs.getInt("assigned_to"),
-                        rs.getInt("project_id"),
                         rs.getDate("due_date"),
-                        rs.getString("status")
+                        rs.getString("status"),
+                        rs.getInt("assigned_to"),
+                        rs.getInt("project_id")
                 );
                 return Optional.of(task);
             }
@@ -81,14 +82,14 @@ public class CRUDtasks implements CrudRepository<Task, Integer> {
 
     @Override
     public void update(Connection conn, Task task) {
-        String sql = "UPDATE tasks SET name = ?, description = ?, assigned_to = ?, project_id = ?, due_date = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE tasks SET name = ?, description = ?, due_date = ?, status = ?,assigned_to = ?, project_id = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, task.getName());
             pstmt.setString(2, task.getDescription());
-            pstmt.setInt(3, task.getAssignedTo());
-            pstmt.setInt(4, task.getProjectId());
-            pstmt.setDate(5, task.getDueDate());
-            pstmt.setString(6, task.getStatus());
+            pstmt.setDate(3, task.getDueDate());
+            pstmt.setString(4, task.getStatus());
+            pstmt.setInt(5, task.getAssignedTo());
+            pstmt.setInt(6, task.getProjectId());
             pstmt.setInt(7, task.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {

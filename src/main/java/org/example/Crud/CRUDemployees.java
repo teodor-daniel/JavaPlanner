@@ -15,7 +15,7 @@ import java.util.Optional;
 public class CRUDemployees implements CrudRepository<Employee, Integer> {
 
     public void save(Connection conn, Employee employee) {
-        String sql = "INSERT INTO employees (name, age, phone_number, email, salary, department_id, employed_status, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (name , age , phone_number, email, salary, department_id, employed_status, team_lead_id, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, employee.getName());
             pstmt.setInt(2, employee.getAge());
@@ -24,7 +24,8 @@ public class CRUDemployees implements CrudRepository<Employee, Integer> {
             pstmt.setDouble(5, employee.getSalary());
             pstmt.setInt(6, employee.getDepartment().getId());
             pstmt.setString(7, employee.getEmployedStatus());
-            pstmt.setInt(8, employee.getCompanyId());
+            pstmt.setObject(8, employee.getTeamLeadId(), java.sql.Types.INTEGER);
+            pstmt.setInt(9, employee.getCompanyId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error saving employee to the database");
@@ -49,6 +50,8 @@ public class CRUDemployees implements CrudRepository<Employee, Integer> {
                         rs.getString("email"),
                         rs.getDouble("salary"),
                         department,
+                        rs.getInt("team_lead_id"),
+                        rs.getInt("company_id"),
                         rs.getString("employed_status")
                 );
                 employees.add(employee);
@@ -76,6 +79,8 @@ public class CRUDemployees implements CrudRepository<Employee, Integer> {
                         rs.getString("email"),
                         rs.getDouble("salary"),
                         department,
+                        rs.getInt("team_lead_id"),
+                        rs.getInt("company_id"),
                         rs.getString("employed_status")
                 );
                 return Optional.of(employee);
@@ -89,7 +94,8 @@ public class CRUDemployees implements CrudRepository<Employee, Integer> {
 
     @Override
     public void update(Connection conn, Employee employee) {
-        String sql = "UPDATE employees SET name = ?, age = ?, phone_number = ?, email = ?, salary = ?, department_id = ?, employed_status = ? WHERE id = ?";
+        // Updated SQL query to include teamLeadId and companyId
+        String sql = "UPDATE employees SET name = ?, age = ?, phone_number = ?, email = ?, salary = ?, department_id = ?, employed_status = ?, team_lead_id = ?, company_id = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, employee.getName());
             pstmt.setInt(2, employee.getAge());
@@ -98,7 +104,9 @@ public class CRUDemployees implements CrudRepository<Employee, Integer> {
             pstmt.setDouble(5, employee.getSalary());
             pstmt.setInt(6, employee.getDepartment().getId());
             pstmt.setString(7, employee.getEmployedStatus());
-            pstmt.setInt(8, employee.getId());
+            pstmt.setObject(8, employee.getTeamLeadId(), java.sql.Types.INTEGER);
+            pstmt.setInt(9, employee.getCompanyId());
+            pstmt.setInt(10, employee.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error updating employee in the database");

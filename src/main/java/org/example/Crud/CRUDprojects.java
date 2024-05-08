@@ -15,13 +15,13 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
 
     @Override
     public void save(Connection conn, Project project) {
-        String sql = "INSERT INTO projects (name, lead_id, status, department_id, budget) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO projects (name,status, budget, department_id, lead_id) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, project.getName());
-            pstmt.setInt(2, project.getTeamLead());
-            pstmt.setString(3, project.getStatus());
-            pstmt.setInt(4, project.getDepartmentId());
-            pstmt.setDouble(5, project.getBudget());
+            pstmt.setString(2, project.getStatus());
+            pstmt.setDouble(3, project.getBudget());
+            pstmt.setInt(4, project.getTeamLead());
+            pstmt.setInt(5, project.getDepartmentId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error saving project to database");
@@ -79,13 +79,13 @@ public class CRUDprojects implements CrudRepository<Project, Integer> {
 
     @Override
     public void update(Connection conn, Project project) {
-        String sql = "UPDATE projects SET name = ?, lead_id = ?, status = ?, department_id = ?, budget = ? WHERE id = ?";
+        String sql = "UPDATE projects SET name = ?, status = ?, budget = ?, department_id = ?, lead_id = ? WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, project.getName());
-            pstmt.setInt(2, project.getTeamLead());
-            pstmt.setString(3, project.getStatus());
+            pstmt.setString(2, project.getStatus());
+            pstmt.setDouble(3, project.getBudget());
             pstmt.setInt(4, project.getDepartmentId());
-            pstmt.setDouble(5, project.getBudget());
+            pstmt.setInt(5, project.getTeamLead());
             pstmt.setInt(6, project.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {

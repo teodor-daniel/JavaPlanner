@@ -6,12 +6,12 @@ public class Task {
     private int id;
     private String name;
     private String description;
-    private Integer assignedTo;
-    private Integer projectId;
     private Date dueDate;
     private String status;
+    private Integer assignedTo;
+    private Integer projectId;
 
-    public Task(int id, String name, String description, Integer assignedTo, Integer projectId, Date dueDate, String status) {
+    public Task(int id, String name, String description, Date dueDate, String status, Integer assignedTo, Integer projectId) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -21,7 +21,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description, Integer assignedTo, Integer projectId, Date dueDate, String status) {
+    public Task(String name, String description,  Date dueDate, String status, Integer assignedTo, Integer projectId) {
         this.name = name;
         this.description = description;
         this.assignedTo = assignedTo;

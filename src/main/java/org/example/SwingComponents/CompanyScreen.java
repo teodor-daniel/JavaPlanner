@@ -1,5 +1,6 @@
 package org.example.SwingComponents;
 
+import org.example.Interfaces.ScreenInterface;
 import org.example.Models.Company;
 import org.example.Services.CompanyService;
 import org.example.Crud.CRUDcompany;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.sql.Connection;
 
-class CompanyScreen extends JFrame {
+public class CompanyScreen extends JFrame implements ScreenInterface {
     private JTable companyTable;
     private Connection conn;
     private JFrame mainPage;
@@ -33,7 +34,7 @@ class CompanyScreen extends JFrame {
         JButton addButton = new JButton("Add");
         JButton backButton = new JButton("Back");
 
-        addButton.addActionListener(e -> openAddCompanyDialog());
+        addButton.addActionListener(e -> openAddDataDialog());
         backButton.addActionListener(e -> {
             CompanyScreen.this.setVisible(false);
             mainPage.setVisible(true);
@@ -46,11 +47,12 @@ class CompanyScreen extends JFrame {
         add(new JScrollPane(companyTable), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        loadCompanyData();
+        loadData();
     }
 
     //Load company data
-    private void loadCompanyData() {
+@Override
+    public void loadData() {
         ArrayList<Company> companies = (ArrayList<Company>) companyService.getAllCompanies(conn);
 
         String[] columnNames = {"ID", "Name", "Address", "Registration Number", "Phone Number", "Email", "Update", "Delete"};
@@ -73,13 +75,15 @@ class CompanyScreen extends JFrame {
         companyTable.setModel(tableModel);
 
         companyTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
-        companyTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateCompany(rowIndex)));
+        companyTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
         companyTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
-        companyTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteCompany(rowIndex)));
+        companyTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
     }
 
-    //Open a form to add a new company
-    private void openAddCompanyDialog() {
+
+
+    @Override
+    public void openAddDataDialog() {
         JTextField nameField = new JTextField();
         JTextField addressField = new JTextField();
         JTextField regNumberField = new JTextField();
@@ -103,11 +107,12 @@ class CompanyScreen extends JFrame {
             Company newCompany = new Company(nameField.getText(), addressField.getText(), regNumberField.getText(),
                     phoneNumberField.getText(), emailField.getText());
             companyService.addCompany(conn, newCompany);
-            loadCompanyData();
+            loadData();
         }
     }
 
-    private void updateCompany(int rowIndex) {
+@Override
+    public void updateData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) companyTable.getModel();
         Integer id = (Integer) model.getValueAt(rowIndex, 0);
         Optional<Company> companyOptional = companyService.getCompanyById(conn, id);
@@ -140,12 +145,15 @@ class CompanyScreen extends JFrame {
                 company.setPhoneNumber(phoneNumberField.getText());
                 company.setEmail(emailField.getText());
                 companyService.updateCompany(conn, company);
-                loadCompanyData();
+                loadData();
             }
         }
     }
 
-    private void confirmAndDeleteCompany(int rowIndex) {
+
+
+    @Override
+    public void confirmAndDeleteData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) companyTable.getModel();
         Integer id = (Integer) model.getValueAt(rowIndex, 0);
 
@@ -158,7 +166,7 @@ class CompanyScreen extends JFrame {
 
         if (result == JOptionPane.YES_OPTION) {
             companyService.deleteCompanyById(conn, id);
-            loadCompanyData();
+            loadData();
         }
     }
 }

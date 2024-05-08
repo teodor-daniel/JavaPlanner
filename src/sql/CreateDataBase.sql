@@ -31,11 +31,11 @@ CREATE TABLE employees (
                            phone_number VARCHAR(20) UNIQUE,
                            email VARCHAR(255) UNIQUE,
                            salary DOUBLE PRECISION,
-                           department_id INTEGER NOT NULL,
                            employed_status VARCHAR(255) NOT NULL,
                            bonus INT DEFAULT NULL,
-                           team_lead_id INTEGER DEFAULT NULL,
                            company_id INTEGER NOT NULL,
+                           department_id INTEGER NOT NULL,
+                           team_lead_id INTEGER DEFAULT NULL,
                            FOREIGN KEY (team_lead_id) REFERENCES employees(id) ON DELETE SET NULL,
                            FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE,
                            FOREIGN KEY (company_id) REFERENCES company(id) ON DELETE CASCADE
@@ -44,10 +44,10 @@ CREATE TABLE employees (
 CREATE TABLE projects (
                           id SERIAL PRIMARY KEY,
                           name VARCHAR(255) NOT NULL,
-                          lead_id INTEGER NOT NULL,
-                          status VARCHAR(50) NOT NULL DEFAULT 'Not started', -- Reflects the abstract status
-                          department_id INTEGER NOT NULL,
                           budget DOUBLE PRECISION,
+                          status VARCHAR(50) NOT NULL DEFAULT 'Not started',
+                          department_id INTEGER NOT NULL,
+                          lead_id INTEGER NOT NULL,
                           FOREIGN KEY (lead_id) REFERENCES employees(id),
                           FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE
 );
@@ -67,11 +67,11 @@ CREATE TABLE tasks (
 
 CREATE TABLE timelogs (
                           id SERIAL PRIMARY KEY,
-                          task_id INTEGER NOT NULL,
-                          employee_id INTEGER NOT NULL,
                           hours_logged DOUBLE PRECISION,
                           log_date DATE NOT NULL,
                           description TEXT,
+                          task_id INTEGER NOT NULL,
+                          employee_id INTEGER NOT NULL,
                           FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
                           FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 );

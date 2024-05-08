@@ -115,7 +115,7 @@ public class Employee extends PersonA implements Iemployee {
         return "Employee{" +
                 "id=" + id +
                 ", salary=" + salary +
-                ", department=" + (department != null ? department.getName() : "No department") +
+                ", department=" + (department != null ? department.getId() : "No department") +
                 ", employedStatus='" + employedStatus + '\'' +
                 ", bonus=" + bonus +
                 ", teamLeadId=" + teamLeadId +

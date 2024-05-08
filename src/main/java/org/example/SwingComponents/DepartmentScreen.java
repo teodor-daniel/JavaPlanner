@@ -1,9 +1,14 @@
 package org.example.SwingComponents;
 
+import org.example.Crud.CRUDemployees;
+import org.example.Interfaces.ScreenInterface;
 import org.example.Models.Department;
+import org.example.Models.Employee;
 import org.example.Services.DepartmentService;
 import org.example.Crud.CRUDdepartments;
+import org.example.Services.EmployeeService;
 import org.example.Validation.DepartmentValidationService;
+import org.example.Validation.EmployeeValidationService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.sql.Connection;
 
-class DepartmentScreen extends JFrame {
+class DepartmentScreen extends JFrame implements ScreenInterface {
     private JTable departmentTable;
     private Connection conn;
     private JFrame mainPage;
@@ -34,7 +39,7 @@ class DepartmentScreen extends JFrame {
         JButton addButton = new JButton("Add");
         JButton backButton = new JButton("Back");
 
-        addButton.addActionListener(e -> openAddDepartmentDialog());
+        addButton.addActionListener(e -> openAddDataDialog());
         backButton.addActionListener(e -> {
             DepartmentScreen.this.setVisible(false);
             mainPage.setVisible(true);
@@ -47,11 +52,14 @@ class DepartmentScreen extends JFrame {
         add(new JScrollPane(departmentTable), BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        loadDepartmentData();
+        loadData();
     }
 
-    // Load department data
-    private void loadDepartmentData() {
+
+
+
+    @Override
+    public void loadData() {
         ArrayList<Department> departments = (ArrayList<Department>) departmentService.getAllDepartments(conn);
 
         String[] columnNames = {"ID", "Name", "Company ID", "Manager ID", "Update", "Delete"};
@@ -72,13 +80,15 @@ class DepartmentScreen extends JFrame {
         departmentTable.setModel(tableModel);
 
         departmentTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
-        departmentTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateDepartment(rowIndex)));
+        departmentTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
         departmentTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
-        departmentTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteDepartment(rowIndex)));
+        departmentTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
     }
 
-    // Open a form to add a new department
-    private void openAddDepartmentDialog() {
+
+
+    @Override
+    public void openAddDataDialog() {
         JTextField nameField = new JTextField();
         JTextField companyIdField = new JTextField();
         JTextField managerIdField = new JTextField();
@@ -95,12 +105,12 @@ class DepartmentScreen extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
             Department newDepartment = new Department(managerIdField.getText().isEmpty() ? null : Integer.parseInt(managerIdField.getText()), nameField.getText(), Integer.parseInt(companyIdField.getText()));
             departmentService.addDepartment(conn, newDepartment);
-            loadDepartmentData();
+            loadData();
         }
     }
 
-    //Update a department by opening a dialog with existing data
-    private void updateDepartment(int rowIndex) {
+    @Override
+    public void updateData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) departmentTable.getModel();
         Integer id = (Integer) model.getValueAt(rowIndex, 0);
         Optional<Department> departmentOptional = departmentService.getDepartmentById(conn, id);
@@ -116,22 +126,39 @@ class DepartmentScreen extends JFrame {
             panel.add(nameField);
             panel.add(new JLabel("Company ID:"));
             panel.add(companyIdField);
-            panel.add(new JLabel("Manager ID:"));
+            panel.add(new JLabel("Manager ID: (Leave blank for none)"));
             panel.add(managerIdField);
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Department", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                department.setName(nameField.getText());
-                department.setCompanyId(Integer.parseInt(companyIdField.getText()));
-                department.setManagerId(managerIdField.getText().isEmpty() ? null : Integer.parseInt(managerIdField.getText())); //de verificat cu validation daca exista.
-                departmentService.updateDepartment(conn, department);
-                loadDepartmentData();
+                try {
+
+                    EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidationService());  // Assume CRUDemployees is initialized appropriately
+                    Integer managerId = managerIdField.getText().isEmpty() ? null : Integer.parseInt(managerIdField.getText());
+
+                    if (managerId != null) {
+                        Optional<Employee> employee = employeeService.getEmployeeById(conn, managerId);
+                        if (!employee.isPresent()) {
+                            JOptionPane.showMessageDialog(null, "No employee found with ID: " + managerId, "Validation Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                    }
+
+                    department.setName(nameField.getText());
+                    department.setCompanyId(Integer.parseInt(companyIdField.getText()));
+                    department.setManagerId(managerId);
+                    System.out.println(department);
+                    departmentService.updateDepartment(conn, department);
+                    loadData();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(null, "Invalid number format in Company ID or Manager ID.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }
 
-    //Confirm and delete a department
-    private void confirmAndDeleteDepartment(int rowIndex) {
+    @Override
+    public void confirmAndDeleteData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) departmentTable.getModel();
         Integer id = (Integer) model.getValueAt(rowIndex, 0);
 
@@ -144,7 +171,7 @@ class DepartmentScreen extends JFrame {
 
         if (result == JOptionPane.YES_OPTION) {
             departmentService.deleteDepartmentById(conn, id);
-            loadDepartmentData();
+            loadData();
         }
     }
 }

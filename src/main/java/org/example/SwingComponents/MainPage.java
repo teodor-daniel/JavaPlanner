@@ -20,7 +20,7 @@ public class MainPage extends JFrame {
 
         JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
-        Dimension buttonSize = new Dimension(100, 30);
+        Dimension buttonSize = new Dimension(150, 30);
 
         JButton companyButton = new JButton("Company");
         companyButton.setPreferredSize(buttonSize);
@@ -32,27 +32,26 @@ public class MainPage extends JFrame {
         departmentButton.addActionListener(new DepartmentButtonClickListener());
         navbarPanel.add(departmentButton);
 
-//        JButton employeeButton = new JButton("Employee");
-//        employeeButton.setPreferredSize(buttonSize);
-//        employeeButton.addActionListener(new EmployeeButtonClickListener());
-//        navbarPanel.add(employeeButton);
-//
-//        JButton projectButton = new JButton("Project");
-//        projectButton.setPreferredSize(buttonSize);
-//        projectButton.addActionListener(new ProjectButtonClickListener());
-//        navbarPanel.add(projectButton);
-//
-//        JButton taskButton = new JButton("Task");
-//        taskButton.setPreferredSize(buttonSize);
-//        taskButton.addActionListener(new TaskButtonClickListener());
-//        navbarPanel.add(taskButton);
-//
-//        JButton timelogButton = new JButton("Time Log");
-//        timelogButton.setPreferredSize(buttonSize);
-//        timelogButton.addActionListener(new TimeLogButtonClickListener());
-//        navbarPanel.add(timelogButton);
+        JButton employeeButton = new JButton("Employee");
+        employeeButton.setPreferredSize(buttonSize);
+        employeeButton.addActionListener(new EmployeeButtonClickListener());
+        navbarPanel.add(employeeButton);
 
-        // Add the navbar panel to the main frame
+        JButton projectButton = new JButton("Project");
+        projectButton.setPreferredSize(buttonSize);
+        projectButton.addActionListener(new ProjectButtonClickListener());
+        navbarPanel.add(projectButton);
+
+        JButton taskButton = new JButton("Task");
+        taskButton.setPreferredSize(buttonSize);
+        taskButton.addActionListener(new TaskButtonClickListener());
+        navbarPanel.add(taskButton);
+
+        JButton timelogButton = new JButton("Time Log");
+        timelogButton.setPreferredSize(buttonSize);
+        timelogButton.addActionListener(new TimeLogButtonClickListener());
+        navbarPanel.add(timelogButton);
+
         add(navbarPanel);
     }
 
@@ -89,37 +88,37 @@ public class MainPage extends JFrame {
         }
     }
 
-//    private class EmployeeButtonClickListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            new EmployeeScreen(conn, MainPage.this).setVisible(true);
-//            MainPage.this.setVisible(false);
-//        }
-//    }
-//
-//    private class ProjectButtonClickListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            new ProjectScreen(conn, MainPage.this).setVisible(true);
-//            MainPage.this.setVisible(false);
-//        }
-//    }
-//
-//    private class TaskButtonClickListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            new TaskScreen(conn, MainPage.this).setVisible(true);
-//            MainPage.this.setVisible(false);
-//        }
-//    }
-//
-//    private class TimeLogButtonClickListener implements ActionListener {
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            new TimeLogScreen(conn, MainPage.this).setVisible(true);
-//            MainPage.this.setVisible(false);
-//        }
-//    }
+    private class EmployeeButtonClickListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new EmployeeScreen(conn, MainPage.this).setVisible(true);
+            MainPage.this.setVisible(false);
+        }
+    }
+
+    private class ProjectButtonClickListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProjectScreen(conn, MainPage.this).setVisible(true);
+            MainPage.this.setVisible(false);
+        }
+    }
+
+    private class TaskButtonClickListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new TaskScreen(conn, MainPage.this).setVisible(true);
+            MainPage.this.setVisible(false);
+        }
+    }
+
+    private class TimeLogButtonClickListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new TimeLogScreen(conn, MainPage.this).setVisible(true);
+            MainPage.this.setVisible(false);
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

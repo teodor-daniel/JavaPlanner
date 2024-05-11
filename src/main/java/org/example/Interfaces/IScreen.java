@@ -1,6 +1,6 @@
 package org.example.Interfaces;
 
-public interface ScreenInterface {
+public interface IScreen {
     public void loadData();
 
     public void openAddDataDialog();

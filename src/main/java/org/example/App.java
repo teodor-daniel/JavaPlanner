@@ -54,7 +54,7 @@ public class App
 
     public static void addTestCompany(Connection conn) {
         CRUDcompany crudCompany = new CRUDcompany();
-        CompanyValidationService companyValidationService = new CompanyValidationService();
+        CompanyValidation companyValidationService = new CompanyValidation();
         CompanyService companyService = new CompanyService(crudCompany, companyValidationService);
 
         Company newCompany = new Company("Valid Test Company", "123 Test Street", "REG-12345", "1234567890", "test@company.com");
@@ -81,7 +81,7 @@ public class App
 
     public static void addTestDepartment(Connection conn){
         CRUDdepartments crudDepartments = new CRUDdepartments();
-        DepartmentValidationService departmentValidationService = new DepartmentValidationService();
+        DepartmentValidation departmentValidationService = new DepartmentValidation();
         DepartmentService departmentService = new DepartmentService(crudDepartments, departmentValidationService);
 
         Department newDepartment = new Department("Engineering", 2);
@@ -110,7 +110,7 @@ public class App
 
         public static void addTestEmployee(Connection conn) {
             CRUDemployees crudEmployees = new CRUDemployees();
-            EmployeeValidationService employeeValidationService = new EmployeeValidationService();
+            EmployeeValidation employeeValidationService = new EmployeeValidation();
             EmployeeService employeeService = new EmployeeService(crudEmployees, employeeValidationService);
 
             CRUDdepartments crudDepartments = new CRUDdepartments();
@@ -142,7 +142,7 @@ public class App
 
     public static void addTestProject(Connection conn) {
         CRUDprojects crudProjects = new CRUDprojects();
-        ProjectValidationService projectValidationService = new ProjectValidationService();
+        ProjectValidation projectValidationService = new ProjectValidation();
         ProjectService projectService = new ProjectService(crudProjects, projectValidationService);
 
         CRUDdepartments crudDepartments = new CRUDdepartments();
@@ -188,7 +188,7 @@ public class App
 
     public static void addTestTask(Connection conn) {
         CRUDtasks crudTasks = new CRUDtasks();
-        TaskValidationService taskValidationService = new TaskValidationService();
+        TaskValidation taskValidationService = new TaskValidation();
         TaskService taskService = new TaskService(crudTasks, taskValidationService);
 
         CRUDemployees crudEmployees = new CRUDemployees();
@@ -235,7 +235,7 @@ public class App
 
     public static void addTestTimeLog(Connection conn) {
         CRUDtimeLogs crudTimeLogs = new CRUDtimeLogs();
-        TimeLogValidationService timeLogValidator = new TimeLogValidationService();
+        TimeLogValidation timeLogValidator = new TimeLogValidation();
         TimeLogService timeLogService = new TimeLogService(crudTimeLogs, timeLogValidator);
 
 

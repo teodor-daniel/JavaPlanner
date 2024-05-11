@@ -2,13 +2,13 @@ package org.example.SwingComponents;
 
 import org.example.Crud.CRUDdepartments;
 import org.example.Crud.CRUDemployees;
-import org.example.Interfaces.ScreenInterface;
+import org.example.Interfaces.IScreen;
 import org.example.Models.Department;
 import org.example.Models.Employee;
 import org.example.Services.DepartmentService;
 import org.example.Services.EmployeeService;
-import org.example.Validation.DepartmentValidationService;
-import org.example.Validation.EmployeeValidationService;
+import org.example.Validation.DepartmentValidation;
+import org.example.Validation.EmployeeValidation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -17,7 +17,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class EmployeeScreen extends JFrame implements ScreenInterface {
+public class EmployeeScreen extends JFrame implements IScreen {
     private JTable employeeTable;
     private Connection conn;
     private JFrame mainPage;
@@ -26,7 +26,7 @@ public class EmployeeScreen extends JFrame implements ScreenInterface {
     public EmployeeScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
         this.mainPage = mainPage;
-        this.employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidationService());
+        this.employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
 
         setTitle("Employee Data");
         setSize(800, 600);
@@ -123,7 +123,7 @@ public class EmployeeScreen extends JFrame implements ScreenInterface {
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Employee", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            DepartmentService departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidationService());
+            DepartmentService departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
             Optional<Department> department = departmentService.getDepartmentById(conn, Integer.parseInt(departmentIdField.getText()));
             if (!department.isPresent()) {
                 JOptionPane.showMessageDialog(null, "No department found with ID: " + departmentIdField.getText(), "Input Error", JOptionPane.ERROR_MESSAGE);

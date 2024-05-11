@@ -1,6 +1,6 @@
 package org.example.Crud;
 
-import org.example.Interfaces.CrudRepository;
+import org.example.Interfaces.ICrudRepository;
 import org.example.Models.Company;
 
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CRUDcompany implements CrudRepository<Company, Integer> {
+public class CRUDcompany implements ICrudRepository<Company, Integer> {
 
     @Override
     public void save(Connection conn, Company company) {

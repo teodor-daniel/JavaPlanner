@@ -1,6 +1,6 @@
 package org.example.Crud;
 
-import org.example.Interfaces.CrudRepository;
+import org.example.Interfaces.ICrudRepository;
 import org.example.Models.TimeLog;
 
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CRUDtimeLogs implements CrudRepository<TimeLog, Integer> {
+public class CRUDtimeLogs implements ICrudRepository<TimeLog, Integer> {
 
     @Override
     public void save(Connection conn, TimeLog timeLog) {

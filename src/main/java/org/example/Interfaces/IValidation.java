@@ -1,6 +1,6 @@
 package org.example.Interfaces;
 
-public interface ValidationService<T> {
+public interface IValidation<T> {
 
     boolean validate(T entity);
 }

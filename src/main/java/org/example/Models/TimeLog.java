@@ -53,7 +53,7 @@
             this.employeeId = employeeId;
         }
 
-        public Double getHoursLogged() {
+        public int getHoursLogged() {
             return hoursLogged;
         }
 

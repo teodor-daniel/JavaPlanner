@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDtimeLogs;
-import org.example.Validation.TimeLogValidationService;
+import org.example.Validation.TimeLogValidation;
 import org.example.Models.TimeLog;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class TimeLogService {
     private final CRUDtimeLogs crudTimeLogs;
-    private final TimeLogValidationService timeLogValidator;
+    private final TimeLogValidation timeLogValidator;
 
-    public TimeLogService(CRUDtimeLogs crudTimeLogs, TimeLogValidationService timeLogValidator) {
+    public TimeLogService(CRUDtimeLogs crudTimeLogs, TimeLogValidation timeLogValidator) {
         this.crudTimeLogs = crudTimeLogs;
         this.timeLogValidator = timeLogValidator;
     }

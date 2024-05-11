@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDemployees;
-import org.example.Validation.EmployeeValidationService;
+import org.example.Validation.EmployeeValidation;
 import org.example.Models.Employee;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class EmployeeService {
     private final CRUDemployees crudEmployees;
-    private final EmployeeValidationService employeeValidator;
+    private final EmployeeValidation employeeValidator;
 
-    public EmployeeService(CRUDemployees crudEmployees, EmployeeValidationService employeeValidator) {
+    public EmployeeService(CRUDemployees crudEmployees, EmployeeValidation employeeValidator) {
         this.crudEmployees = crudEmployees;
         this.employeeValidator = employeeValidator;
     }

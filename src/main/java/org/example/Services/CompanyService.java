@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDcompany;
-import org.example.Validation.CompanyValidationService;
+import org.example.Validation.CompanyValidation;
 import org.example.Models.Company;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class CompanyService {
     private final CRUDcompany crudCompany;
-    private final CompanyValidationService companyValidator;
+    private final CompanyValidation companyValidator;
 
-    public CompanyService(CRUDcompany crudCompany, CompanyValidationService companyValidator) {
+    public CompanyService(CRUDcompany crudCompany, CompanyValidation companyValidator) {
         this.crudCompany = crudCompany;
         this.companyValidator = companyValidator;
     }

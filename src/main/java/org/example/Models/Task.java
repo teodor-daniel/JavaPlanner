@@ -70,7 +70,7 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 

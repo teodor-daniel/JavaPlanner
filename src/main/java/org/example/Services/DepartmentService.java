@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDdepartments;
-import org.example.Validation.DepartmentValidationService;
+import org.example.Validation.DepartmentValidation;
 import org.example.Models.Department;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class DepartmentService {
     private final CRUDdepartments crudDepartments;
-    private final DepartmentValidationService departmentValidator;
+    private final DepartmentValidation departmentValidator;
 
-    public DepartmentService(CRUDdepartments crudDepartments, DepartmentValidationService departmentValidator) {
+    public DepartmentService(CRUDdepartments crudDepartments, DepartmentValidation departmentValidator) {
         this.crudDepartments = crudDepartments;
         this.departmentValidator = departmentValidator;
     }

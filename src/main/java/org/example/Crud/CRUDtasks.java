@@ -1,6 +1,6 @@
 package org.example.Crud;
 
-import org.example.Interfaces.CrudRepository;
+import org.example.Interfaces.ICrudRepository;
 import org.example.Models.Task;
 
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CRUDtasks implements CrudRepository<Task, Integer> {
+public class CRUDtasks implements ICrudRepository<Task, Integer> {
 
     @Override
     public void save(Connection conn, Task task) {

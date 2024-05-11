@@ -1,10 +1,10 @@
     package org.example.SwingComponents;
 
     import org.example.Crud.CRUDtasks;
-    import org.example.Interfaces.ScreenInterface;
+    import org.example.Interfaces.IScreen;
     import org.example.Models.Task;
     import org.example.Services.TaskService;
-    import org.example.Validation.TaskValidationService;
+    import org.example.Validation.TaskValidation;
 
     import javax.swing.*;
     import javax.swing.table.DefaultTableModel;
@@ -14,7 +14,7 @@
     import java.util.ArrayList;
     import java.util.Optional;
 
-    public class TaskScreen extends JFrame implements ScreenInterface {
+    public class TaskScreen extends JFrame implements IScreen {
         private JTable taskTable;
         private Connection conn;
         private JFrame mainPage;
@@ -23,7 +23,7 @@
         public TaskScreen(Connection conn, JFrame mainPage) {
             this.conn = conn;
             this.mainPage = mainPage;
-            this.taskService = new TaskService(new CRUDtasks(), new TaskValidationService());
+            this.taskService = new TaskService(new CRUDtasks(), new TaskValidation());
 
             setTitle("Task Data");
             setSize(800, 600);

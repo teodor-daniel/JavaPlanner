@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDprojects;
-import org.example.Validation.ProjectValidationService;
+import org.example.Validation.ProjectValidation;
 import org.example.Models.Project;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class ProjectService {
     private final CRUDprojects crudProjects;
-    private final ProjectValidationService projectValidator;
+    private final ProjectValidation projectValidator;
 
-    public ProjectService(CRUDprojects crudProjects, ProjectValidationService projectValidator) {
+    public ProjectService(CRUDprojects crudProjects, ProjectValidation projectValidator) {
         this.crudProjects = crudProjects;
         this.projectValidator = projectValidator;
     }

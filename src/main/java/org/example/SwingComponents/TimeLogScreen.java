@@ -1,10 +1,10 @@
 package org.example.SwingComponents;
 
 import org.example.Crud.CRUDtimeLogs;
-import org.example.Interfaces.ScreenInterface;
+import org.example.Interfaces.IScreen;
 import org.example.Models.TimeLog;
 import org.example.Services.TimeLogService;
-import org.example.Validation.TimeLogValidationService;
+import org.example.Validation.TimeLogValidation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,7 +14,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class TimeLogScreen extends JFrame implements ScreenInterface {
+public class TimeLogScreen extends JFrame implements IScreen {
     private JTable timeLogTable;
     private Connection conn;
     private JFrame mainPage;
@@ -23,7 +23,7 @@ public class TimeLogScreen extends JFrame implements ScreenInterface {
     public TimeLogScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
         this.mainPage = mainPage;
-        this.timeLogService = new TimeLogService(new CRUDtimeLogs(), new TimeLogValidationService());
+        this.timeLogService = new TimeLogService(new CRUDtimeLogs(), new TimeLogValidation());
 
         setTitle("Time Log Data");
         setSize(800, 600);

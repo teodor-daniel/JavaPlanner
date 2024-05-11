@@ -1,7 +1,7 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDtasks;
-import org.example.Validation.TaskValidationService;
+import org.example.Validation.TaskValidation;
 import org.example.Models.Task;
 
 import java.sql.Connection;
@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public class TaskService {
     private final CRUDtasks crudTasks;
-    private final TaskValidationService taskValidator;
+    private final TaskValidation taskValidator;
 
-    public TaskService(CRUDtasks crudTasks, TaskValidationService taskValidator) {
+    public TaskService(CRUDtasks crudTasks, TaskValidation taskValidator) {
         this.crudTasks = crudTasks;
         this.taskValidator = taskValidator;
     }

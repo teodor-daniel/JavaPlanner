@@ -1,10 +1,10 @@
 package org.example.SwingComponents;
 
 import org.example.Crud.CRUDprojects;
-import org.example.Interfaces.ScreenInterface;
+import org.example.Interfaces.IScreen;
 import org.example.Models.Project;
 import org.example.Services.ProjectService;
-import org.example.Validation.ProjectValidationService;
+import org.example.Validation.ProjectValidation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class ProjectScreen extends JFrame implements ScreenInterface{
+public class ProjectScreen extends JFrame implements IScreen {
     private JTable projectTable;
     private Connection conn;
     private JFrame mainPage;
@@ -22,7 +22,7 @@ public class ProjectScreen extends JFrame implements ScreenInterface{
     public ProjectScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
         this.mainPage = mainPage;
-        this.projectService = new ProjectService(new CRUDprojects(), new ProjectValidationService());
+        this.projectService = new ProjectService(new CRUDprojects(), new ProjectValidation());
 
         setTitle("Project Data");
         setSize(800, 600);

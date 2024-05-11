@@ -1,6 +1,6 @@
 package org.example.Crud;
 
-import org.example.Interfaces.CrudRepository;
+import org.example.Interfaces.ICrudRepository;
 import org.example.Models.Department;
 import org.example.Models.Employee;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CRUDemployees implements CrudRepository<Employee, Integer> {
+public class CRUDemployees implements ICrudRepository<Employee, Integer> {
 
     public void save(Connection conn, Employee employee) {
         String sql = "INSERT INTO employees (name , age , phone_number, email, salary, department_id, employed_status, team_lead_id, company_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";

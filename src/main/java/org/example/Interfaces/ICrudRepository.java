@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
-public interface CrudRepository<T, ID> {
+public interface ICrudRepository<T, ID> {
     void save(Connection conn, T entity);
     void update(Connection conn, T entity);
     void deleteById(Connection conn, ID id);

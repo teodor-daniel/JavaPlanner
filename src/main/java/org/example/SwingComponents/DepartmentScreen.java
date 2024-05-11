@@ -1,25 +1,23 @@
 package org.example.SwingComponents;
 
 import org.example.Crud.CRUDemployees;
-import org.example.Interfaces.ScreenInterface;
+import org.example.Interfaces.IScreen;
 import org.example.Models.Department;
 import org.example.Models.Employee;
 import org.example.Services.DepartmentService;
 import org.example.Crud.CRUDdepartments;
 import org.example.Services.EmployeeService;
-import org.example.Validation.DepartmentValidationService;
-import org.example.Validation.EmployeeValidationService;
+import org.example.Validation.DepartmentValidation;
+import org.example.Validation.EmployeeValidation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.sql.Connection;
 
-class DepartmentScreen extends JFrame implements ScreenInterface {
+class DepartmentScreen extends JFrame implements IScreen {
     private JTable departmentTable;
     private Connection conn;
     private JFrame mainPage;
@@ -28,7 +26,7 @@ class DepartmentScreen extends JFrame implements ScreenInterface {
     public DepartmentScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
         this.mainPage = mainPage;
-        this.departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidationService());
+        this.departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
 
         setTitle("Department Data");
         setSize(800, 600);
@@ -133,7 +131,7 @@ class DepartmentScreen extends JFrame implements ScreenInterface {
             if (result == JOptionPane.OK_OPTION) {
                 try {
 
-                    EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidationService());  // Assume CRUDemployees is initialized appropriately
+                    EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());  // Assume CRUDemployees is initialized appropriately
                     Integer managerId = managerIdField.getText().isEmpty() ? null : Integer.parseInt(managerIdField.getText());
 
                     if (managerId != null) {

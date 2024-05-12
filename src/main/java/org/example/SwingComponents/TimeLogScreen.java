@@ -1,5 +1,9 @@
 package org.example.SwingComponents;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.example.Crud.CRUDtimeLogs;
 import org.example.Interfaces.IScreen;
 import org.example.Models.TimeLog;
@@ -8,10 +12,15 @@ import org.example.Validation.TimeLogValidation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 
 public class TimeLogScreen extends JFrame implements IScreen {
@@ -19,6 +28,8 @@ public class TimeLogScreen extends JFrame implements IScreen {
     private Connection conn;
     private JFrame mainPage;
     private final TimeLogService timeLogService;
+
+    private boolean sortAscending = true;
 
     public TimeLogScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
@@ -33,6 +44,8 @@ public class TimeLogScreen extends JFrame implements IScreen {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton addButton = new JButton("Add");
         JButton backButton = new JButton("Back");
+        JButton pdfButton = new JButton("Get PDF");
+        JButton sortButton = new JButton("Sort by Name");
 
         addButton.addActionListener(e -> openAddDataDialog());
         backButton.addActionListener(e -> {
@@ -40,8 +53,21 @@ public class TimeLogScreen extends JFrame implements IScreen {
             mainPage.setVisible(true);
         });
 
+        pdfButton.addActionListener(e -> {
+            try {
+                saveTableDataToPDF();
+            } catch (DocumentException | FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        sortButton.addActionListener(e -> toggleSort());
+
+
         bottomPanel.add(addButton);
         bottomPanel.add(backButton);
+        bottomPanel.add(pdfButton);
+        bottomPanel.add(sortButton);
 
         timeLogTable = new JTable();
         add(new JScrollPane(timeLogTable), BorderLayout.CENTER);
@@ -170,4 +196,47 @@ public class TimeLogScreen extends JFrame implements IScreen {
             loadData();
         }
     }
+
+    private void saveTableDataToPDF() throws DocumentException, FileNotFoundException {
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream("LogData.pdf"));
+        document.open();
+
+        PdfPTable pdfTable = new PdfPTable(timeLogTable.getColumnCount());
+        for (int i = 0; i < timeLogTable.getColumnCount(); i++) {
+            pdfTable.addCell(timeLogTable.getColumnName(i));
+        }
+
+        for (int rows = 0; rows < timeLogTable.getRowCount(); rows++) {
+            for (int cols = 0; cols < timeLogTable.getColumnCount(); cols++) {
+                pdfTable.addCell(timeLogTable.getModel().getValueAt(rows, cols).toString());
+            }
+        }
+
+        document.add(pdfTable);
+        document.close();
+        JOptionPane.showMessageDialog(this, "PDF file has been created successfully!");
+    }
+
+    private void toggleSort() {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(timeLogTable.getModel());
+        timeLogTable.setRowSorter(sorter);
+        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+
+        int columnIndexToSort = 6;
+        sortKeys.add(new RowSorter.SortKey(columnIndexToSort, sortAscending ? SortOrder.ASCENDING : SortOrder.DESCENDING));
+
+        sorter.setComparator(columnIndexToSort, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        sorter.setSortKeys(sortKeys);
+        sorter.sort();
+
+        sortAscending = !sortAscending;
+    }
+
 }

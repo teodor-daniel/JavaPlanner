@@ -42,6 +42,7 @@ public class CompanyScreen extends JFrame implements IScreen {
         JButton addButton = new JButton("Add");
         JButton backButton = new JButton("Back");
         JButton pdfButton = new JButton("Get PDF");
+        JButton sortButton = new JButton("Sort by Name");
 
         addButton.addActionListener(e -> openAddDataDialog());
         backButton.addActionListener(e -> {
@@ -55,14 +56,13 @@ public class CompanyScreen extends JFrame implements IScreen {
                 ex.printStackTrace();
             }
         });
-        JButton sortButton = new JButton("Sort by Name");
         sortButton.addActionListener(e -> toggleSort());
-        bottomPanel.add(sortButton);
 
 
         bottomPanel.add(addButton);
         bottomPanel.add(backButton);
         bottomPanel.add(pdfButton);
+        bottomPanel.add(sortButton);
 
         companyTable = new JTable();
         add(new JScrollPane(companyTable), BorderLayout.CENTER);

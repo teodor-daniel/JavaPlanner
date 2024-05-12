@@ -20,8 +20,8 @@ public class CRUDprojects implements ICrudRepository<Project, Integer> {
             pstmt.setString(1, project.getName());
             pstmt.setString(2, project.getStatus());
             pstmt.setDouble(3, project.getBudget());
-            pstmt.setInt(4, project.getTeamLead());
-            pstmt.setInt(5, project.getDepartmentId());
+            pstmt.setInt(4, project.getDepartmentId());
+            pstmt.setInt(5, project.getTeamLead());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error saving project to database");

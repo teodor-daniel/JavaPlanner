@@ -15,7 +15,7 @@ public class MainPage extends JFrame {
     public MainPage() {
         initDBConnection();
         setTitle("Database Management");
-        setSize(600, 200);
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -118,12 +118,5 @@ public class MainPage extends JFrame {
             new TimeLogScreen(conn, MainPage.this).setVisible(true);
             MainPage.this.setVisible(false);
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainPage mainPage = new MainPage();
-            mainPage.setVisible(true);
-        });
     }
 }

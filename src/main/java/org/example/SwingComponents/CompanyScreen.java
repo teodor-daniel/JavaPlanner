@@ -16,6 +16,7 @@ import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Optional;
 import java.sql.Connection;
 
@@ -92,7 +93,7 @@ public void loadData() {
     }
 
     companyTable.setModel(tableModel);
-    companyTable.setRowSorter(new TableRowSorter<>(tableModel)); // Set the sorter
+    companyTable.setRowSorter(new TableRowSorter<>(tableModel));
 
     companyTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
     companyTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
@@ -217,13 +218,20 @@ public void loadData() {
         companyTable.setRowSorter(sorter);
         ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
 
-        int columnIndexToSort = 1; // Assuming "Name" is the second column
+        int columnIndexToSort = 1;
         sortKeys.add(new RowSorter.SortKey(columnIndexToSort, sortAscending ? SortOrder.ASCENDING : SortOrder.DESCENDING));
+
+        sorter.setComparator(columnIndexToSort, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
 
         sorter.setSortKeys(sortKeys);
         sorter.sort();
 
-        sortAscending = !sortAscending; // Toggle the sort order
+        sortAscending = !sortAscending;
     }
 }
 

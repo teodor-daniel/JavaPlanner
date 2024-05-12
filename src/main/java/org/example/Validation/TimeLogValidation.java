@@ -29,7 +29,7 @@ public class TimeLogValidation implements IValidation<TimeLog> {
         }
     }
 
-    private void validateHoursLogged(int hoursLogged) {
+    private void validateHoursLogged(Double hoursLogged) {
         if (hoursLogged <= 0) {
             throw new InvalidHoursLoggedException("Error: Hours logged must be greater than zero.");
         }

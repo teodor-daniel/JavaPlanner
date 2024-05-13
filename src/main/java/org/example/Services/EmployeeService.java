@@ -29,6 +29,8 @@ public class EmployeeService {
         return crudEmployees.findAll(conn);
     }
 
+    public List<Employee> getAllManager(Connection conn){return crudEmployees.findAllManagers(conn);}
+
     public Optional<Employee> getEmployeeById(Connection conn, Integer id) {
         return crudEmployees.findById(conn, id);
     }

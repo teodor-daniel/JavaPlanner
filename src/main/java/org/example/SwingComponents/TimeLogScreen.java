@@ -4,12 +4,20 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.Crud.CRUDemployees;
+import org.example.Crud.CRUDtasks;
 import org.example.Crud.CRUDtimeLogs;
 import org.example.Interfaces.IScreen;
+import org.example.Models.Employee;
+import org.example.Models.Task;
 import org.example.Models.TimeLog;
+import org.example.Services.EmployeeService;
+import org.example.Services.TaskService;
 import org.example.Services.TimeLogService;
+import org.example.Validation.EmployeeValidation;
+import org.example.Validation.TaskValidation;
 import org.example.Validation.TimeLogValidation;
-
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -27,6 +35,9 @@ public class TimeLogScreen extends JFrame implements IScreen {
     private JTable timeLogTable;
     private Connection conn;
     private JFrame mainPage;
+    private final TaskService taskService = new TaskService(new CRUDtasks(), new TaskValidation());
+    private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
+
     private final TimeLogService timeLogService;
 
     private boolean sortAscending = true;
@@ -106,17 +117,28 @@ public class TimeLogScreen extends JFrame implements IScreen {
 
     @Override
     public void openAddDataDialog() {
-        JTextField taskIdField = new JTextField();
-        JTextField employeeIdField = new JTextField();
         JTextField hoursLoggedField = new JTextField();
         JTextField logDateField = new JTextField();
         JTextField descriptionField = new JTextField();
 
+        JComboBox<Integer> taskComboBox = new JComboBox<>();
+        JComboBox<Integer> employeeComboBox = new JComboBox<>();
+
+        List<Task> tasks = taskService.getAllTasks(conn);
+        List<Employee> employees = employeeService.getAllEmployees(conn);
+
+        for (Task task : tasks) {
+            taskComboBox.addItem(task.getId());
+        }
+        for (Employee employee : employees) {
+            employeeComboBox.addItem(employee.getId());
+        }
+
         JPanel panel = new JPanel(new GridLayout(5, 2));
         panel.add(new JLabel("Task ID:"));
-        panel.add(taskIdField);
+        panel.add(taskComboBox);
         panel.add(new JLabel("Employee ID:"));
-        panel.add(employeeIdField);
+        panel.add(employeeComboBox);
         panel.add(new JLabel("Hours Logged:"));
         panel.add(hoursLoggedField);
         panel.add(new JLabel("Log Date (YYYY-MM-DD):"));
@@ -127,8 +149,8 @@ public class TimeLogScreen extends JFrame implements IScreen {
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Time Log", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             TimeLog newTimeLog = new TimeLog(
-                    Integer.parseInt(taskIdField.getText()),
-                    Integer.parseInt(employeeIdField.getText()),
+                    ((Task) taskComboBox.getSelectedItem()).getId(),
+                    ((Employee) employeeComboBox.getSelectedItem()).getId(),
                     Double.parseDouble(hoursLoggedField.getText()),
                     Date.valueOf(logDateField.getText()),
                     descriptionField.getText()
@@ -137,6 +159,7 @@ public class TimeLogScreen extends JFrame implements IScreen {
             loadData();
         }
     }
+
 
     @Override
     public void updateData(int rowIndex) {
@@ -147,28 +170,44 @@ public class TimeLogScreen extends JFrame implements IScreen {
         if (timeLogOptional.isPresent()) {
             TimeLog timeLog = timeLogOptional.get();
 
-            JTextField taskIdField = new JTextField(String.valueOf(timeLog.getTaskId()));
-            JTextField employeeIdField = new JTextField(String.valueOf(timeLog.getEmployeeId()));
             JTextField hoursLoggedField = new JTextField(String.valueOf(timeLog.getHoursLogged()));
             JTextField logDateField = new JTextField(timeLog.getLogDate().toString());
             JTextField descriptionField = new JTextField(timeLog.getDescription());
 
+            JComboBox<Integer> taskComboBox = new JComboBox<>();
+            JComboBox<Integer> employeeComboBox = new JComboBox<>();
+
+            List<Task> tasks = taskService.getAllTasks(conn);
+            List<Employee> employees = employeeService.getAllEmployees(conn);
+
+            for (Task task : tasks) {
+                taskComboBox.addItem(task.getId());
+            }
+
+            for (Employee employee : employees) {
+                employeeComboBox.addItem(employee.getId());
+            }
+
+            taskComboBox.setSelectedItem(timeLog.getTaskId());
+            employeeComboBox.setSelectedItem(timeLog.getEmployeeId());
+
+
             JPanel panel = new JPanel(new GridLayout(5, 2));
-            panel.add(new JLabel("Task ID:"));
-            panel.add(taskIdField);
-            panel.add(new JLabel("Employee ID:"));
-            panel.add(employeeIdField);
             panel.add(new JLabel("Hours Logged:"));
             panel.add(hoursLoggedField);
             panel.add(new JLabel("Log Date (YYYY-MM-DD):"));
             panel.add(logDateField);
             panel.add(new JLabel("Description:"));
             panel.add(descriptionField);
+            panel.add(new JLabel("Task ID:"));
+            panel.add(taskComboBox);
+            panel.add(new JLabel("Employee ID:"));
+            panel.add(employeeComboBox);
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Time Log", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                timeLog.setTaskId(Integer.parseInt(taskIdField.getText()));
-                timeLog.setEmployeeId(Integer.parseInt(employeeIdField.getText()));
+                timeLog.setTaskId(((Task) taskComboBox.getSelectedItem()).getId());
+                timeLog.setEmployeeId(((Employee) employeeComboBox.getSelectedItem()).getId());
                 timeLog.setHoursLogged(Double.parseDouble(hoursLoggedField.getText()));
                 timeLog.setLogDate(Date.valueOf(logDateField.getText()));
                 timeLog.setDescription(descriptionField.getText());
@@ -177,6 +216,7 @@ public class TimeLogScreen extends JFrame implements IScreen {
             }
         }
     }
+
 
     @Override
     public void confirmAndDeleteData(int rowIndex) {

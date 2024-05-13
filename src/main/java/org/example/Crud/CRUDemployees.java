@@ -1,7 +1,6 @@
 package org.example.Crud;
 
 import org.example.Interfaces.ICrudRepository;
-import org.example.Models.Department;
 import org.example.Models.Employee;
 
 import java.sql.Connection;
@@ -22,9 +21,9 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
             pstmt.setString(3, employee.getPhoneNumber());
             pstmt.setString(4, employee.getEmail());
             pstmt.setDouble(5, employee.getSalary());
-            pstmt.setInt(6, employee.getDepartment().getId());
+            pstmt.setInt(6, employee.getDepartment());
             pstmt.setString(7, employee.getEmployedStatus());
-            pstmt.setObject(8, employee.getTeamLeadId(), java.sql.Types.INTEGER);
+            pstmt.setObject(8, employee.getManagerId(), java.sql.Types.INTEGER);
             pstmt.setInt(9, employee.getCompanyId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -41,7 +40,6 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                Department department = new Department(rs.getInt("department_id"), null, 0);
                 Employee employee = new Employee(
                         rs.getInt("id"),
                         rs.getString("name"),
@@ -49,7 +47,7 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
                         rs.getString("phone_number"),
                         rs.getString("email"),
                         rs.getDouble("salary"),
-                        department,
+                        rs.getInt("department_id"),
                         rs.getInt("team_lead_id"),
                         rs.getInt("company_id"),
                         rs.getString("employed_status")
@@ -63,6 +61,37 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
         return employees;
     }
 
+
+    public List<Employee> findAllManagers(Connection conn) {
+        List<Employee> managers = new ArrayList<>();
+        String sql = "SELECT * FROM employees";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                if(rs.getInt("team_lead_id") == rs.getInt("id")) {
+
+                    Employee employee = new Employee(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getInt("age"),
+                            rs.getString("phone_number"),
+                            rs.getString("email"),
+                            rs.getDouble("salary"),
+                            rs.getInt("department_id"),
+                            rs.getInt("team_lead_id"),
+                            rs.getInt("company_id"),
+                            rs.getString("employed_status")
+                    );
+                    managers.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error loading employees from the database");
+            e.printStackTrace();
+        }
+        return managers;
+    }
+
     @Override
     public Optional<Employee> findById(Connection conn, Integer id) {
         String sql = "SELECT * FROM employees WHERE id = ?";
@@ -70,7 +99,6 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                Department department = new Department(rs.getInt("department_id"), null, 0);
                 Employee employee = new Employee(
                         rs.getInt("id"),
                         rs.getString("name"),
@@ -78,7 +106,7 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
                         rs.getString("phone_number"),
                         rs.getString("email"),
                         rs.getDouble("salary"),
-                        department,
+                        rs.getInt("department_id"),
                         rs.getInt("team_lead_id"),
                         rs.getInt("company_id"),
                         rs.getString("employed_status")
@@ -102,9 +130,9 @@ public class CRUDemployees implements ICrudRepository<Employee, Integer> {
             pstmt.setString(3, employee.getPhoneNumber());
             pstmt.setString(4, employee.getEmail());
             pstmt.setDouble(5, employee.getSalary());
-            pstmt.setInt(6, employee.getDepartment().getId());
+            pstmt.setInt(6, employee.getDepartment());
             pstmt.setString(7, employee.getEmployedStatus());
-            pstmt.setObject(8, employee.getTeamLeadId(), java.sql.Types.INTEGER);
+            pstmt.setObject(8, employee.getManagerId(), java.sql.Types.INTEGER);
             pstmt.setInt(9, employee.getCompanyId());
             pstmt.setInt(10, employee.getId());
             pstmt.executeUpdate();

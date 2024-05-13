@@ -119,7 +119,7 @@ public class AppTest extends TestCase {
         if(optionalDepartment.isPresent()) {
             Department existingDepartment = optionalDepartment.get();
 
-            Employee newEmployee = new Employee("Teo", 30, "1234567890", "teo@yahoo.com", 60000.00, existingDepartment,  null, existingDepartment.getCompanyId(), "Working");
+            Employee newEmployee = new Employee("Teo", 30, "1234567890", "teo@yahoo.com", 60000.00, 2,  null, existingDepartment.getCompanyId(), "Working");
             employeeService.addEmployee(conn, newEmployee);
             System.out.println("Employee added successfully.");
 

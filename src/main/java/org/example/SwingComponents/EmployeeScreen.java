@@ -4,13 +4,17 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.Crud.CRUDcompany;
 import org.example.Crud.CRUDdepartments;
 import org.example.Crud.CRUDemployees;
 import org.example.Interfaces.IScreen;
+import org.example.Models.Company;
 import org.example.Models.Department;
 import org.example.Models.Employee;
+import org.example.Services.CompanyService;
 import org.example.Services.DepartmentService;
 import org.example.Services.EmployeeService;
+import org.example.Validation.CompanyValidation;
 import org.example.Validation.DepartmentValidation;
 import org.example.Validation.EmployeeValidation;
 
@@ -25,19 +29,22 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
-
+import java.util.List;
 public class EmployeeScreen extends JFrame implements IScreen {
     private JTable employeeTable;
     private Connection conn;
     private JFrame mainPage;
     private final EmployeeService employeeService;
+    private DepartmentService departmentService;
+    private CompanyService companyService;
     private boolean sortAscending = true;
 
     public EmployeeScreen(Connection conn, JFrame mainPage) {
         this.conn = conn;
         this.mainPage = mainPage;
         this.employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
-
+        this.companyService = new CompanyService(new CRUDcompany(), new CompanyValidation());
+        this.departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
         setTitle("Employee Data");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,7 +87,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
     @Override
     public void loadData() {
         ArrayList<Employee> employees = (ArrayList<Employee>) employeeService.getAllEmployees(conn);
-        String[] columnNames = {"ID", "Name", "Age", "Phone", "Email", "Salary",  "Status", "Company ID","Department ID", "Team Lead ID", "Update", "Delete"};
+        String[] columnNames = {"ID", "Name", "Age", "Phone", "Email", "Salary",  "Status", "Company ID","Department ID", "Manager ID", "Update", "Delete"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
         for (Employee employee : employees) {
@@ -93,8 +100,8 @@ public class EmployeeScreen extends JFrame implements IScreen {
                     employee.getSalary(),
                     employee.getEmployedStatus(),
                     employee.getCompanyId(),
-                    employee.getDepartment().getId(),
-                    employee.getTeamLeadId(),
+                    employee.getDepartment(),
+                    employee.getManagerId(),
                     "Update",
                     "Delete"
             };
@@ -118,9 +125,9 @@ public class EmployeeScreen extends JFrame implements IScreen {
         JTextField phoneField = new JTextField();
         JTextField emailField = new JTextField();
         JTextField salaryField = new JTextField();
-        JTextField departmentIdField = new JTextField();
-        JTextField companyIdField = new JTextField();
-        JTextField teamLeadIdField = new JTextField();
+        JComboBox<Integer> companyComboBox = new JComboBox<>();
+        JComboBox<Integer> departmentComboBox = new JComboBox<>();
+        JComboBox<Integer> managerComboBox = new JComboBox<>();
         JTextField statusField = new JTextField();
 
         JPanel panel = new JPanel(new GridLayout(9, 2));
@@ -137,22 +144,32 @@ public class EmployeeScreen extends JFrame implements IScreen {
         panel.add(new JLabel("Employment Status:"));
         panel.add(statusField);
         panel.add(new JLabel("Company ID:"));
-        panel.add(companyIdField);
+        panel.add(companyComboBox);
         panel.add(new JLabel("Department ID:"));
-        panel.add(departmentIdField);
-        panel.add(new JLabel("Team Lead ID:"));
-        panel.add(teamLeadIdField);
+        panel.add(departmentComboBox);
+        panel.add(new JLabel("Manager ID:"));
+        panel.add(managerComboBox);
 
+        List<Company> companies = companyService.getAllCompanies(conn);
+        List<Department> departments = departmentService.getAllDepartments(conn);
+        List<Employee> managers = employeeService.getAllManager(conn);
+
+        for(Company company: companies){
+            companyComboBox.addItem(company.getId());
+        }
+        for(Department department: departments){
+            departmentComboBox.addItem(department.getId());
+        }
+        for(Employee manager: managers){
+            managerComboBox.addItem(manager.getId());
+        }
 
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Employee", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            DepartmentService departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
-            Optional<Department> department = departmentService.getDepartmentById(conn, Integer.parseInt(departmentIdField.getText()));
-            if (!department.isPresent()) {
-                JOptionPane.showMessageDialog(null, "No department found with ID: " + departmentIdField.getText(), "Input Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            Integer selectedCompany = (Integer) companyComboBox.getSelectedItem();
+            Integer selectedDepartment = (Integer) departmentComboBox.getSelectedItem();
+            Integer selectedManager = (Integer) managerComboBox.getSelectedItem();
 
             Employee newEmployee = new Employee(
                     nameField.getText(),
@@ -160,11 +177,12 @@ public class EmployeeScreen extends JFrame implements IScreen {
                     phoneField.getText(),
                     emailField.getText(),
                     Double.parseDouble(salaryField.getText()),
-                    department.get(),
-                    teamLeadIdField.getText().isEmpty() ? null : Integer.parseInt(teamLeadIdField.getText()),
-                    Integer.parseInt(companyIdField.getText()),
+                    selectedDepartment,
+                    selectedCompany,
+                    selectedManager,
                     statusField.getText()
             );
+
             System.out.println(newEmployee);
             employeeService.addEmployee(conn, newEmployee);
             loadData();
@@ -179,16 +197,30 @@ public class EmployeeScreen extends JFrame implements IScreen {
 
         if (employeeOptional.isPresent()) {
             Employee employee = employeeOptional.get();
+            System.out.println(employee);
 
             JTextField nameField = new JTextField(employee.getName());
             JTextField ageField = new JTextField(String.valueOf(employee.getAge()));
             JTextField phoneField = new JTextField(employee.getPhoneNumber());
             JTextField emailField = new JTextField(employee.getEmail());
             JTextField salaryField = new JTextField(String.valueOf(employee.getSalary()));
-            JTextField departmentIdField = new JTextField(String.valueOf(employee.getDepartment().getId()));
-            JTextField companyIdField = new JTextField(String.valueOf(employee.getCompanyId()));
-            JTextField teamLeadIdField = new JTextField(employee.getTeamLeadId() != null ? employee.getTeamLeadId().toString() : "");
             JTextField statusField = new JTextField(employee.getEmployedStatus());
+
+            JComboBox<Integer> companyComboBox = new JComboBox<>();
+            JComboBox<Integer> departmentComboBox = new JComboBox<>();
+            JComboBox<Integer> managerComboBox = new JComboBox<>();
+
+            List<Company> companies = companyService.getAllCompanies(conn);
+            List<Department> departments = departmentService.getAllDepartments(conn);
+            List<Employee> managers = employeeService.getAllManager(conn);
+
+            companies.forEach(company -> companyComboBox.addItem(company.getId()));
+            departments.forEach(department -> departmentComboBox.addItem(department.getId()));
+
+            managerComboBox.addItem(employee.getId());
+            for(Employee manager: managers){
+                managerComboBox.addItem(manager.getId());
+            }
 
             JPanel panel = new JPanel(new GridLayout(9, 2));
             panel.add(new JLabel("Name:"));
@@ -204,11 +236,12 @@ public class EmployeeScreen extends JFrame implements IScreen {
             panel.add(new JLabel("Employment Status:"));
             panel.add(statusField);
             panel.add(new JLabel("Company ID:"));
-            panel.add(companyIdField);
+            panel.add(companyComboBox);
             panel.add(new JLabel("Department ID:"));
-            panel.add(departmentIdField);
-            panel.add(new JLabel("Team Lead ID:"));
-            panel.add(teamLeadIdField);
+            panel.add(departmentComboBox);
+            panel.add(new JLabel("Manager ID:"));
+            panel.add(managerComboBox);
+
 
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Employee", JOptionPane.OK_CANCEL_OPTION);
@@ -218,17 +251,19 @@ public class EmployeeScreen extends JFrame implements IScreen {
                 employee.setPhoneNumber(phoneField.getText());
                 employee.setEmail(emailField.getText());
                 employee.setSalary(Double.parseDouble(salaryField.getText()));
-                employee.setDepartment(new Department(Integer.parseInt(departmentIdField.getText()), "", 0)); // Note: Real department fetching logic might be needed here
-                employee.setCompanyId(Integer.parseInt(companyIdField.getText()));
-                employee.setTeamLeadId(teamLeadIdField.getText().isEmpty() ? null : Integer.parseInt(teamLeadIdField.getText()));
                 employee.setEmployedStatus(statusField.getText());
-                System.out.println(employee);
-                System.out.println(employee.getDepartment());
+                employee.setCompanyId((Integer) companyComboBox.getSelectedItem());
+                employee.setDepartment((Integer) departmentComboBox.getSelectedItem());
+                employee.setManagerId(managerComboBox.getSelectedItem() == null ? null : (Integer) managerComboBox.getSelectedItem());
+
                 employeeService.updateEmployee(conn, employee);
                 loadData();
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Employee not found", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     @Override
     public void confirmAndDeleteData(int rowIndex) {

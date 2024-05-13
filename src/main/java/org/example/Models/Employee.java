@@ -5,40 +5,41 @@ import org.example.Interfaces.Iemployee;
 public class Employee extends PersonA implements Iemployee {
     private int id;
     private double salary;
-    private Department department;
     private String employedStatus;
     private Integer bonus;
-    private Integer teamLeadId;
     private Integer companyId;
+    private Integer departmentId;
+    private Integer managerId;
 
-    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Department department, Integer teamLeadId, Integer companyId, String employedStatus) {
+
+    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Integer department, Integer managerId, Integer companyId, String employedStatus) {
         super(name, age, phoneNumber, email);
         this.id = id;
         this.salary = salary;
         this.bonus = null;
-        this.department = department;
-        this.teamLeadId = teamLeadId;
+        this.departmentId = department;
+        this.managerId = managerId;
         this.companyId = companyId;
         this.employedStatus = employedStatus;
     }
 
-    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Department department, String employedStatus) {
+    public Employee(int id, String name, int age, String phoneNumber, String email, double salary, Integer department, String employedStatus) {
         super(name, age, phoneNumber, email);
         this.id = id;
         this.salary = salary;
         this.bonus = null;
-        this.department = department;
-        this.teamLeadId = null;
+        this.departmentId = department;
+        this.managerId = null;
         this.companyId = null;
         this.employedStatus = employedStatus;
     }
 
-    public Employee(String name, int age, String phoneNumber, String email, double salary, Department department, Integer teamLeadId, Integer companyId, String employedStatus) {
+    public Employee(String name, int age, String phoneNumber, String email, double salary, Integer department, Integer managerId, Integer companyId, String employedStatus) {
         super(name, age, phoneNumber, email);
         this.salary = salary;
         this.bonus = null;
-        this.department = department;
-        this.teamLeadId = teamLeadId;
+        this.departmentId = department;
+        this.managerId = managerId;
         this.companyId = companyId;
         this.employedStatus = employedStatus;
     }
@@ -60,12 +61,12 @@ public class Employee extends PersonA implements Iemployee {
         this.salary = salary;
     }
 
-    public Department getDepartment() {
-        return department;
+    public Integer getDepartment() {
+        return departmentId;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setDepartment(Integer department) {
+        this.departmentId = department;
     }
 
     public Integer getBonus() {
@@ -84,12 +85,12 @@ public class Employee extends PersonA implements Iemployee {
         this.employedStatus = employedStatus;
     }
 
-    public Integer getTeamLeadId() {
-        return teamLeadId;
+    public Integer getManagerId() {
+        return managerId;
     }
 
-    public void setTeamLeadId(Integer teamLeadId) {
-        this.teamLeadId = teamLeadId;
+    public void setManagerId(Integer managerId) {
+        this.managerId = managerId;
     }
 
     public Integer getCompanyId() {
@@ -115,10 +116,10 @@ public class Employee extends PersonA implements Iemployee {
         return "Employee{" +
                 "id=" + id +
                 ", salary=" + salary +
-                ", department=" + (department != null ? department.getId() : "No department") +
+                ", department=" + departmentId +
                 ", employedStatus='" + employedStatus + '\'' +
                 ", bonus=" + bonus +
-                ", teamLeadId=" + teamLeadId +
+                ", teamLeadId=" + managerId +
                 ", companyId=" + companyId +
                 "} " + super.toString();
     }

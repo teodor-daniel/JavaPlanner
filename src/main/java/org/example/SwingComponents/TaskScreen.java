@@ -4,10 +4,18 @@
     import com.itextpdf.text.DocumentException;
     import com.itextpdf.text.pdf.PdfPTable;
     import com.itextpdf.text.pdf.PdfWriter;
+    import org.example.Crud.CRUDemployees;
+    import org.example.Crud.CRUDprojects;
     import org.example.Crud.CRUDtasks;
     import org.example.Interfaces.IScreen;
+    import org.example.Models.Employee;
+    import org.example.Models.Project;
     import org.example.Models.Task;
+    import org.example.Services.EmployeeService;
+    import org.example.Services.ProjectService;
     import org.example.Services.TaskService;
+    import org.example.Validation.EmployeeValidation;
+    import org.example.Validation.ProjectValidation;
     import org.example.Validation.TaskValidation;
 
     import javax.swing.*;
@@ -21,12 +29,15 @@
     import java.sql.Date;
     import java.util.ArrayList;
     import java.util.Comparator;
+    import java.util.List;
     import java.util.Optional;
 
     public class TaskScreen extends JFrame implements IScreen {
         private JTable taskTable;
         private Connection conn;
         private JFrame mainPage;
+        private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
+        private  final ProjectService projectService = new ProjectService(new CRUDprojects(), new ProjectValidation());
         private final TaskService taskService;
 
         private boolean sortAscending = true;
@@ -113,8 +124,18 @@
             JTextField descriptionField = new JTextField();
             JTextField statusField = new JTextField();
             JTextField dueDateField = new JTextField();
-            JTextField assignedToField = new JTextField();
-            JTextField projectIdField = new JTextField();
+            JComboBox<Integer> assignedToComboBox = new JComboBox<>();
+            JComboBox<Integer> projectComboBox = new JComboBox<>();
+
+            java.util.List<Employee> employees = employeeService.getAllEmployees(conn);
+            List<Project> projects = projectService.getAllProjects(conn);
+
+            for (Employee employee : employees) {
+                assignedToComboBox.addItem(employee.getId());
+            }
+            for (Project project : projects) {
+                projectComboBox.addItem(project.getId());
+            }
 
             JPanel panel = new JPanel(new GridLayout(6, 2));
             panel.add(new JLabel("Name:"));
@@ -126,9 +147,9 @@
             panel.add(new JLabel("Due Date:"));
             panel.add(dueDateField);
             panel.add(new JLabel("Assigned To:"));
-            panel.add(assignedToField);
+            panel.add(assignedToComboBox);
             panel.add(new JLabel("Project ID:"));
-            panel.add(projectIdField);
+            panel.add(projectComboBox);
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Add New Task", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
@@ -137,13 +158,14 @@
                         descriptionField.getText(),
                         Date.valueOf(dueDateField.getText()),
                         statusField.getText(),
-                        Integer.parseInt(assignedToField.getText()),
-                        Integer.parseInt(projectIdField.getText())
+                        ((Employee) assignedToComboBox.getSelectedItem()).getId(),
+                        ((Project) projectComboBox.getSelectedItem()).getId()
                 );
                 taskService.addTask(conn, newTask);
                 loadData();
             }
         }
+
 
         @Override
         public void updateData(int rowIndex) {
@@ -157,10 +179,25 @@
                 JTextField nameField = new JTextField(task.getName());
                 JTextField descriptionField = new JTextField(task.getDescription());
                 JTextField statusField = new JTextField(task.getStatus());
-                JTextField dueDateField = new JTextField(String.valueOf(task.getDueDate()));
-                JTextField projectIdField = new JTextField(String.valueOf(task.getProjectId()));
+                JTextField dueDateField = new JTextField(task.getDueDate().toString());
 
-                JPanel panel = new JPanel(new GridLayout(5, 2));
+                JComboBox<Integer> assignedToComboBox = new JComboBox<>();
+                JComboBox<Integer> projectComboBox = new JComboBox<>();
+
+                List<Employee> employees = employeeService.getAllEmployees(conn);
+                List<Project> projects = projectService.getAllProjects(conn);
+
+                for (Employee employee : employees) {
+                    assignedToComboBox.addItem(employee.getId());
+                }
+                for (Project project : projects) {
+                    projectComboBox.addItem(project.getId());
+                }
+
+                assignedToComboBox.setSelectedItem(task.getAssignedTo());
+                projectComboBox.setSelectedItem(task.getProjectId());
+
+                JPanel panel = new JPanel(new GridLayout(6, 2));
                 panel.add(new JLabel("Name:"));
                 panel.add(nameField);
                 panel.add(new JLabel("Description:"));
@@ -169,16 +206,20 @@
                 panel.add(statusField);
                 panel.add(new JLabel("Due Date:"));
                 panel.add(dueDateField);
+                panel.add(new JLabel("Assigned To:"));
+                panel.add(assignedToComboBox);
                 panel.add(new JLabel("Project ID:"));
-                panel.add(projectIdField);
+                panel.add(projectComboBox);
 
                 int result = JOptionPane.showConfirmDialog(null, panel, "Update Task", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
                     task.setName(nameField.getText());
                     task.setDescription(descriptionField.getText());
                     task.setStatus(statusField.getText());
-                    task.setDueDate((Date.valueOf(dueDateField.getText())));
-                    task.setProjectId(Integer.parseInt(projectIdField.getText()));
+                    task.setDueDate(Date.valueOf(dueDateField.getText()));
+                    task.setAssignedTo((Integer) assignedToComboBox.getSelectedItem());
+                    task.setProjectId( (Integer) projectComboBox.getSelectedItem());
+
                     taskService.updateTask(conn, task);
                     loadData();
                 }

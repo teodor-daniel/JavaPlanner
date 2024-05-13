@@ -4,10 +4,18 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.Crud.CRUDdepartments;
+import org.example.Crud.CRUDemployees;
 import org.example.Crud.CRUDprojects;
 import org.example.Interfaces.IScreen;
+import org.example.Models.Department;
+import org.example.Models.Employee;
 import org.example.Models.Project;
+import org.example.Services.DepartmentService;
+import org.example.Services.EmployeeService;
 import org.example.Services.ProjectService;
+import org.example.Validation.DepartmentValidation;
+import org.example.Validation.EmployeeValidation;
 import org.example.Validation.ProjectValidation;
 
 import javax.swing.*;
@@ -20,6 +28,7 @@ import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 public class ProjectScreen extends JFrame implements IScreen {
@@ -27,6 +36,8 @@ public class ProjectScreen extends JFrame implements IScreen {
     private Connection conn;
     private JFrame mainPage;
     private final ProjectService projectService;
+    private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
+    private final DepartmentService departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
     private boolean sortAscending = true;
 
     public ProjectScreen(Connection conn, JFrame mainPage) {
@@ -108,8 +119,18 @@ public class ProjectScreen extends JFrame implements IScreen {
         JTextField nameField = new JTextField();
         JTextField statusField = new JTextField();
         JTextField budgetField = new JTextField();
-        JTextField departmentIdField = new JTextField();
-        JTextField teamLeadIdField = new JTextField();
+        JComboBox<Integer> departmentComboBox = new JComboBox<>();
+        JComboBox<Integer> teamLeadComboBox = new JComboBox<>();
+
+        java.util.List<Department> departments = departmentService.getAllDepartments(conn);
+        List<Employee> teamLeads = employeeService.getAllManager(conn);
+
+        for (Department department : departments) {
+            departmentComboBox.addItem(department.getId());
+        }
+        for (Employee teamLead : teamLeads) {
+            teamLeadComboBox.addItem(teamLead.getId());
+        }
 
         JPanel panel = new JPanel(new GridLayout(5, 2));
         panel.add(new JLabel("Name:"));
@@ -119,9 +140,9 @@ public class ProjectScreen extends JFrame implements IScreen {
         panel.add(new JLabel("Budget:"));
         panel.add(budgetField);
         panel.add(new JLabel("Department ID:"));
-        panel.add(departmentIdField);
+        panel.add(departmentComboBox);
         panel.add(new JLabel("Team Lead ID:"));
-        panel.add(teamLeadIdField);
+        panel.add(teamLeadComboBox);
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Project", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
@@ -129,13 +150,14 @@ public class ProjectScreen extends JFrame implements IScreen {
                     nameField.getText(),
                     statusField.getText(),
                     Double.parseDouble(budgetField.getText()),
-                    Integer.parseInt(departmentIdField.getText()),
-                    Integer.parseInt(teamLeadIdField.getText())
+                    (Integer) departmentComboBox.getSelectedItem(),
+                    (Integer) teamLeadComboBox.getSelectedItem()
             );
             projectService.addProject(conn, newProject);
             loadData();
         }
     }
+
 
     @Override
     public void updateData(int rowIndex) {
@@ -149,8 +171,21 @@ public class ProjectScreen extends JFrame implements IScreen {
             JTextField nameField = new JTextField(project.getName());
             JTextField statusField = new JTextField(project.getStatus());
             JTextField budgetField = new JTextField(String.valueOf(project.getBudget()));
-            JTextField departmentIdField = new JTextField(String.valueOf(project.getDepartmentId()));
-            JTextField teamLeadIdField = new JTextField(String.valueOf(project.getTeamLead()));
+            JComboBox<Integer> departmentComboBox = new JComboBox<>();
+            JComboBox<Integer> teamLeadComboBox = new JComboBox<>();
+
+            List<Department> departments = departmentService.getAllDepartments(conn);
+            List<Employee> teamLeads = employeeService.getAllManager(conn);
+
+            for (Department department : departments) {
+                departmentComboBox.addItem(department.getId());
+            }
+            for (Employee teamLead : teamLeads) {
+                teamLeadComboBox.addItem(teamLead.getId());
+            }
+
+            departmentComboBox.setSelectedItem(project.getDepartmentId());
+            teamLeadComboBox.setSelectedItem(project.getTeamLead());
 
             JPanel panel = new JPanel(new GridLayout(5, 2));
             panel.add(new JLabel("Name:"));
@@ -160,22 +195,25 @@ public class ProjectScreen extends JFrame implements IScreen {
             panel.add(new JLabel("Budget:"));
             panel.add(budgetField);
             panel.add(new JLabel("Department ID:"));
-            panel.add(departmentIdField);
+            panel.add(departmentComboBox);
             panel.add(new JLabel("Team Lead ID:"));
-            panel.add(teamLeadIdField);
+            panel.add(teamLeadComboBox);
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Project", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 project.setName(nameField.getText());
                 project.setStatus(statusField.getText());
                 project.setBudget(Double.parseDouble(budgetField.getText()));
-                project.setDepartmentId(Integer.parseInt(departmentIdField.getText()));
-                project.setTeamLead(Integer.parseInt(teamLeadIdField.getText()));
+                project.setDepartmentId((Integer) departmentComboBox.getSelectedItem());
+                project.setTeamLead((Integer) teamLeadComboBox.getSelectedItem());
                 projectService.updateProject(conn, project);
                 loadData();
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Project not found", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     @Override
     public void confirmAndDeleteData(int rowIndex) {

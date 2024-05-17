@@ -6,9 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class ButtonEditor extends DefaultCellEditor {
-    private String label;
     private final java.util.function.Consumer<Integer> action;
     private final JButton button;
+    private String label;
     private int cellEditorRow;
 
     public ButtonEditor(JCheckBox checkBox, String label, java.util.function.Consumer<Integer> action) {

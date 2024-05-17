@@ -5,27 +5,29 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.example.Crud.CRUDcompany;
 import org.example.Interfaces.IScreen;
 import org.example.Models.Company;
 import org.example.Services.CompanyService;
-import org.example.Crud.CRUDcompany;
 import org.example.Validation.CompanyValidation;
+
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
-import java.sql.Connection;
 
 public class CompanyScreen extends JFrame implements IScreen {
-    private JTable companyTable;
-    private Connection conn;
-    private JFrame mainPage;
     private final CompanyService companyService;
-
+    private final JTable companyTable;
+    private final Connection conn;
+    private final JFrame mainPage;
     private boolean sortAscending = true;
 
     public CompanyScreen(Connection conn, JFrame mainPage) {
@@ -72,36 +74,34 @@ public class CompanyScreen extends JFrame implements IScreen {
     }
 
     //Load company data
-@Override
-public void loadData() {
-    ArrayList<Company> companies = (ArrayList<Company>) companyService.getAllCompanies(conn);
-    String[] columnNames = {"ID", "Name", "Address", "Registration Number", "Phone Number", "Email", "Update", "Delete"};
-    DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+    @Override
+    public void loadData() {
+        ArrayList<Company> companies = (ArrayList<Company>) companyService.getAllCompanies(conn);
+        String[] columnNames = {"ID", "Name", "Address", "Registration Number", "Phone Number", "Email", "Update", "Delete"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
-    for (Company company : companies) {
-        Object[] row = {
-                company.getId(),
-                company.getName(),
-                company.getAddress(),
-                company.getRegistrationNumber(),
-                company.getPhoneNumber(),
-                company.getEmail(),
-                "Update",
-                "Delete"
-        };
-        tableModel.addRow(row);
+        for (Company company : companies) {
+            Object[] row = {
+                    company.getId(),
+                    company.getName(),
+                    company.getAddress(),
+                    company.getRegistrationNumber(),
+                    company.getPhoneNumber(),
+                    company.getEmail(),
+                    "Update",
+                    "Delete"
+            };
+            tableModel.addRow(row);
+        }
+
+        companyTable.setModel(tableModel);
+        companyTable.setRowSorter(new TableRowSorter<>(tableModel));
+
+        companyTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
+        companyTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
+        companyTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
+        companyTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
     }
-
-    companyTable.setModel(tableModel);
-    companyTable.setRowSorter(new TableRowSorter<>(tableModel));
-
-    companyTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
-    companyTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
-    companyTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
-    companyTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
-}
-
-
 
 
     @Override
@@ -133,7 +133,7 @@ public void loadData() {
         }
     }
 
-@Override
+    @Override
     public void updateData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) companyTable.getModel();
         Integer id = (Integer) model.getValueAt(rowIndex, 0);
@@ -173,7 +173,6 @@ public void loadData() {
     }
 
 
-
     @Override
     public void confirmAndDeleteData(int rowIndex) {
         DefaultTableModel model = (DefaultTableModel) companyTable.getModel();
@@ -190,20 +189,24 @@ public void loadData() {
             companyService.deleteCompanyById(conn, id);
             loadData();
         }
+
     }
+
     //Save to pdf
     private void saveTableDataToPDF() throws DocumentException, FileNotFoundException {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream("CompanyData.pdf"));
         document.open();
 
-        PdfPTable pdfTable = new PdfPTable(companyTable.getColumnCount());
-        for (int i = 0; i < companyTable.getColumnCount(); i++) {
+        int numberOfColumns = companyTable.getColumnCount() - 2;
+        PdfPTable pdfTable = new PdfPTable(numberOfColumns);
+
+        for (int i = 0; i < numberOfColumns; i++) {
             pdfTable.addCell(companyTable.getColumnName(i));
         }
 
         for (int rows = 0; rows < companyTable.getRowCount(); rows++) {
-            for (int cols = 0; cols < companyTable.getColumnCount(); cols++) {
+            for (int cols = 0; cols < numberOfColumns; cols++) {
                 pdfTable.addCell(companyTable.getModel().getValueAt(rows, cols).toString());
             }
         }
@@ -212,6 +215,7 @@ public void loadData() {
         document.close();
         JOptionPane.showMessageDialog(this, "PDF file has been created successfully!");
     }
+
 
     private void toggleSort() {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(companyTable.getModel());

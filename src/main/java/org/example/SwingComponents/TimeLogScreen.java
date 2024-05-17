@@ -17,7 +17,8 @@ import org.example.Services.TimeLogService;
 import org.example.Validation.EmployeeValidation;
 import org.example.Validation.TaskValidation;
 import org.example.Validation.TimeLogValidation;
-import java.util.List;
+import org.jdatepicker.impl.*;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -27,9 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
 
 public class TimeLogScreen extends JFrame implements IScreen {
     private JTable timeLogTable;
@@ -37,9 +38,7 @@ public class TimeLogScreen extends JFrame implements IScreen {
     private JFrame mainPage;
     private final TaskService taskService = new TaskService(new CRUDtasks(), new TaskValidation());
     private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
-
     private final TimeLogService timeLogService;
-
     private boolean sortAscending = true;
 
     public TimeLogScreen(Connection conn, JFrame mainPage) {
@@ -73,7 +72,6 @@ public class TimeLogScreen extends JFrame implements IScreen {
         });
 
         sortButton.addActionListener(e -> toggleSort());
-
 
         bottomPanel.add(addButton);
         bottomPanel.add(backButton);
@@ -118,7 +116,6 @@ public class TimeLogScreen extends JFrame implements IScreen {
     @Override
     public void openAddDataDialog() {
         JTextField hoursLoggedField = new JTextField();
-        JTextField logDateField = new JTextField();
         JTextField descriptionField = new JTextField();
 
         JComboBox<Integer> taskComboBox = new JComboBox<>();
@@ -134,6 +131,15 @@ public class TimeLogScreen extends JFrame implements IScreen {
             employeeComboBox.addItem(employee.getId());
         }
 
+        // Date picker component
+        UtilDateModel model = new UtilDateModel();
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+
         JPanel panel = new JPanel(new GridLayout(5, 2));
         panel.add(new JLabel("Task ID:"));
         panel.add(taskComboBox);
@@ -141,25 +147,25 @@ public class TimeLogScreen extends JFrame implements IScreen {
         panel.add(employeeComboBox);
         panel.add(new JLabel("Hours Logged:"));
         panel.add(hoursLoggedField);
-        panel.add(new JLabel("Log Date (YYYY-MM-DD):"));
-        panel.add(logDateField);
+        panel.add(new JLabel("Log Date:"));
+        panel.add(datePicker);
         panel.add(new JLabel("Description:"));
         panel.add(descriptionField);
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Time Log", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
+            Date selectedDate = new Date(model.getValue().getTime());
             TimeLog newTimeLog = new TimeLog(
-                    ((Task) taskComboBox.getSelectedItem()).getId(),
-                    ((Employee) employeeComboBox.getSelectedItem()).getId(),
+                    (Integer) taskComboBox.getSelectedItem(),
+                    (Integer) employeeComboBox.getSelectedItem(),
                     Double.parseDouble(hoursLoggedField.getText()),
-                    Date.valueOf(logDateField.getText()),
+                    selectedDate,
                     descriptionField.getText()
             );
             timeLogService.addTimeLog(conn, newTimeLog);
             loadData();
         }
     }
-
 
     @Override
     public void updateData(int rowIndex) {
@@ -171,7 +177,6 @@ public class TimeLogScreen extends JFrame implements IScreen {
             TimeLog timeLog = timeLogOptional.get();
 
             JTextField hoursLoggedField = new JTextField(String.valueOf(timeLog.getHoursLogged()));
-            JTextField logDateField = new JTextField(timeLog.getLogDate().toString());
             JTextField descriptionField = new JTextField(timeLog.getDescription());
 
             JComboBox<Integer> taskComboBox = new JComboBox<>();
@@ -191,12 +196,20 @@ public class TimeLogScreen extends JFrame implements IScreen {
             taskComboBox.setSelectedItem(timeLog.getTaskId());
             employeeComboBox.setSelectedItem(timeLog.getEmployeeId());
 
+            // Date picker component with initial value
+            UtilDateModel dateModel = new UtilDateModel(timeLog.getLogDate());
+            Properties p = new Properties();
+            p.put("text.today", "Today");
+            p.put("text.month", "Month");
+            p.put("text.year", "Year");
+            JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, p);
+            JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
             JPanel panel = new JPanel(new GridLayout(5, 2));
             panel.add(new JLabel("Hours Logged:"));
             panel.add(hoursLoggedField);
-            panel.add(new JLabel("Log Date (YYYY-MM-DD):"));
-            panel.add(logDateField);
+            panel.add(new JLabel("Log Date:"));
+            panel.add(datePicker);
             panel.add(new JLabel("Description:"));
             panel.add(descriptionField);
             panel.add(new JLabel("Task ID:"));
@@ -206,17 +219,17 @@ public class TimeLogScreen extends JFrame implements IScreen {
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Time Log", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                timeLog.setTaskId(((Task) taskComboBox.getSelectedItem()).getId());
-                timeLog.setEmployeeId(((Employee) employeeComboBox.getSelectedItem()).getId());
+                Date selectedDate = new Date(dateModel.getValue().getTime());
+                timeLog.setTaskId((Integer) taskComboBox.getSelectedItem());
+                timeLog.setEmployeeId((Integer) employeeComboBox.getSelectedItem());
                 timeLog.setHoursLogged(Double.parseDouble(hoursLoggedField.getText()));
-                timeLog.setLogDate(Date.valueOf(logDateField.getText()));
+                timeLog.setLogDate(selectedDate);
                 timeLog.setDescription(descriptionField.getText());
                 timeLogService.updateTimeLog(conn, timeLog);
                 loadData();
             }
         }
     }
-
 
     @Override
     public void confirmAndDeleteData(int rowIndex) {
@@ -231,8 +244,7 @@ public class TimeLogScreen extends JFrame implements IScreen {
         );
 
         if (result == JOptionPane.YES_OPTION) {
-            timeLogService.deleteTimeLogById
-                    (conn, id);
+            timeLogService.deleteTimeLogById(conn, id);
             loadData();
         }
     }
@@ -242,13 +254,15 @@ public class TimeLogScreen extends JFrame implements IScreen {
         PdfWriter.getInstance(document, new FileOutputStream("LogData.pdf"));
         document.open();
 
-        PdfPTable pdfTable = new PdfPTable(timeLogTable.getColumnCount());
-        for (int i = 0; i < timeLogTable.getColumnCount(); i++) {
+        int numberOfColumns = timeLogTable.getColumnCount() - 2;
+        PdfPTable pdfTable = new PdfPTable(numberOfColumns);
+
+        for (int i = 0; i < numberOfColumns; i++) {
             pdfTable.addCell(timeLogTable.getColumnName(i));
         }
 
         for (int rows = 0; rows < timeLogTable.getRowCount(); rows++) {
-            for (int cols = 0; cols < timeLogTable.getColumnCount(); cols++) {
+            for (int cols = 0; cols < numberOfColumns; cols++) {
                 pdfTable.addCell(timeLogTable.getModel().getValueAt(rows, cols).toString());
             }
         }
@@ -257,6 +271,7 @@ public class TimeLogScreen extends JFrame implements IScreen {
         document.close();
         JOptionPane.showMessageDialog(this, "PDF file has been created successfully!");
     }
+
 
     private void toggleSort() {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(timeLogTable.getModel());
@@ -279,4 +294,22 @@ public class TimeLogScreen extends JFrame implements IScreen {
         sortAscending = !sortAscending;
     }
 
+    private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
+        private final String datePattern = "yyyy-MM-dd";
+        private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+        @Override
+        public Object stringToValue(String text) throws java.text.ParseException {
+            return dateFormatter.parseObject(text);
+        }
+
+        @Override
+        public String valueToString(Object value) throws java.text.ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
+            return "";
+        }
+    }
 }

@@ -1,8 +1,8 @@
 package org.example.Services;
 
 import org.example.Crud.CRUDcompany;
-import org.example.Validation.CompanyValidation;
 import org.example.Models.Company;
+import org.example.Validation.CompanyValidation;
 
 import java.sql.Connection;
 import java.util.List;
@@ -20,6 +20,7 @@ public class CompanyService {
     public void addCompany(Connection conn, Company company) {
         if (!companyValidator.validate(company)) {
             throw new IllegalArgumentException("Invalid company data");
+
         }
 
         crudCompany.save(conn, company);

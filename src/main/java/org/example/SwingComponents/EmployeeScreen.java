@@ -7,7 +7,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.example.Crud.CRUDcompany;
 import org.example.Crud.CRUDdepartments;
 import org.example.Crud.CRUDemployees;
-import org.example.Enum.ActivityState;
 import org.example.Enum.EmployeeState;
 import org.example.Interfaces.IScreen;
 import org.example.Models.Company;
@@ -30,15 +29,16 @@ import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
+
 public class EmployeeScreen extends JFrame implements IScreen {
-    private JTable employeeTable;
-    private Connection conn;
-    private JFrame mainPage;
     private final EmployeeService employeeService;
-    private DepartmentService departmentService;
-    private CompanyService companyService;
+    private final JTable employeeTable;
+    private final Connection conn;
+    private final JFrame mainPage;
+    private final DepartmentService departmentService;
+    private final CompanyService companyService;
     private boolean sortAscending = true;
 
     public EmployeeScreen(Connection conn, JFrame mainPage) {
@@ -89,7 +89,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
     @Override
     public void loadData() {
         ArrayList<Employee> employees = (ArrayList<Employee>) employeeService.getAllEmployees(conn);
-        String[] columnNames = {"ID", "Name", "Age", "Phone", "Email", "Salary",  "Status", "Company ID","Department ID", "Manager ID", "Update", "Delete"};
+        String[] columnNames = {"ID", "Name", "Age", "Phone", "Email", "Salary", "Status", "Company ID", "Department ID", "Manager ID", "Update", "Delete"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
         for (Employee employee : employees) {
@@ -158,20 +158,20 @@ public class EmployeeScreen extends JFrame implements IScreen {
         List<Department> departments = departmentService.getAllDepartments(conn);
         List<Employee> managers = employeeService.getAllManager(conn);
         List<String> stats = new ArrayList<>();
-        for(EmployeeState employeeState : EmployeeState.values()){
+        for (EmployeeState employeeState : EmployeeState.values()) {
             stats.add(employeeState.toString());
         }
-        for(Company company: companies){
+        for (Company company : companies) {
             companyComboBox.addItem(company.getId());
         }
-        for(Department department: departments){
+        for (Department department : departments) {
             departmentComboBox.addItem(department.getId());
         }
-        for(Employee manager: managers){
+        for (Employee manager : managers) {
             managerComboBox.addItem(manager.getId());
         }
 
-        for(String status: stats){
+        for (String status : stats) {
             statusComboBox.addItem(status);
         }
 
@@ -180,7 +180,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
             Integer selectedCompany = (Integer) companyComboBox.getSelectedItem();
             Integer selectedDepartment = (Integer) departmentComboBox.getSelectedItem();
             Integer selectedManager = (Integer) managerComboBox.getSelectedItem();
-            String  selectedStatus = (String) statusComboBox.getSelectedItem();
+            String selectedStatus = (String) statusComboBox.getSelectedItem();
             Employee newEmployee = new Employee(
                     nameField.getText(),
                     Integer.parseInt(ageField.getText()),
@@ -228,11 +228,11 @@ public class EmployeeScreen extends JFrame implements IScreen {
             departments.forEach(department -> departmentComboBox.addItem(department.getId()));
 
             managerComboBox.addItem(employee.getId());
-            for(Employee manager: managers){
+            for (Employee manager : managers) {
                 managerComboBox.addItem(manager.getId());
             }
 
-            for(EmployeeState employeeState : EmployeeState.values()){
+            for (EmployeeState employeeState : EmployeeState.values()) {
 
                 statusComboBox.addItem(employeeState.toString());
             }
@@ -258,7 +258,6 @@ public class EmployeeScreen extends JFrame implements IScreen {
             panel.add(managerComboBox);
 
 
-
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Employee", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 employee.setName(nameField.getText());
@@ -266,7 +265,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
                 employee.setPhoneNumber(phoneField.getText());
                 employee.setEmail(emailField.getText());
                 employee.setSalary(Double.parseDouble(salaryField.getText()));
-                employee.setEmployedStatus( (String) statusComboBox.getSelectedItem());
+                employee.setEmployedStatus((String) statusComboBox.getSelectedItem());
                 employee.setCompanyId((Integer) companyComboBox.getSelectedItem());
                 employee.setDepartment((Integer) departmentComboBox.getSelectedItem());
                 employee.setManagerId(managerComboBox.getSelectedItem() == null ? null : (Integer) managerComboBox.getSelectedItem());
@@ -302,16 +301,18 @@ public class EmployeeScreen extends JFrame implements IScreen {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream("EmployeeData.pdf"));
         document.open();
+        int numberOfColumns = employeeTable.getColumnCount() - 2;
+        PdfPTable pdfTable = new PdfPTable(numberOfColumns);
 
-        PdfPTable pdfTable = new PdfPTable(employeeTable.getColumnCount());
-        for (int i = 0; i < employeeTable.getColumnCount(); i++) {
+        for (int i = 0; i < numberOfColumns; i++) {
             pdfTable.addCell(employeeTable.getColumnName(i));
         }
 
         for (int rows = 0; rows < employeeTable.getRowCount(); rows++) {
-            for (int cols = 0; cols < employeeTable.getColumnCount(); cols++) {
+            for (int cols = 0; cols < numberOfColumns; cols++) {
                 pdfTable.addCell(employeeTable.getModel().getValueAt(rows, cols).toString());
             }
+            
         }
 
         document.add(pdfTable);

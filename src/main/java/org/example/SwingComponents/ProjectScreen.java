@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class ProjectScreen extends JFrame implements IScreen {
-    private JTable projectTable;
-    private Connection conn;
-    private JFrame mainPage;
     private final ProjectService projectService;
     private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
     private final DepartmentService departmentService = new DepartmentService(new CRUDdepartments(), new DepartmentValidation());
+    private final JTable projectTable;
+    private final Connection conn;
+    private final JFrame mainPage;
     private boolean sortAscending = true;
 
     public ProjectScreen(Connection conn, JFrame mainPage) {
@@ -181,7 +181,7 @@ public class ProjectScreen extends JFrame implements IScreen {
                 departmentComboBox.addItem(department.getId());
             }
             for (Employee teamLead : teamLeads) {
-                if(teamLead.getEmployedStatus().equals("Resigned"))
+                if (teamLead.getEmployedStatus().equals("Resigned"))
                     continue;
                 teamLeadComboBox.addItem(teamLead.getId());
             }
@@ -234,18 +234,22 @@ public class ProjectScreen extends JFrame implements IScreen {
             loadData();
         }
     }
+
     private void saveTableDataToPDF() throws DocumentException, FileNotFoundException {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream("ProjectData.pdf"));
         document.open();
 
-        PdfPTable pdfTable = new PdfPTable(projectTable.getColumnCount());
-        for (int i = 0; i < projectTable.getColumnCount(); i++) {
+
+        int numberOfColumns = projectTable.getColumnCount() - 2;
+        PdfPTable pdfTable = new PdfPTable(numberOfColumns);
+
+        for (int i = 0; i < numberOfColumns; i++) {
             pdfTable.addCell(projectTable.getColumnName(i));
         }
 
         for (int rows = 0; rows < projectTable.getRowCount(); rows++) {
-            for (int cols = 0; cols < projectTable.getColumnCount(); cols++) {
+            for (int cols = 0; cols < numberOfColumns; cols++) {
                 pdfTable.addCell(projectTable.getModel().getValueAt(rows, cols).toString());
             }
         }

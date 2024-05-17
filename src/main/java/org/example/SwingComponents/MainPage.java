@@ -1,75 +1,139 @@
 package org.example.SwingComponents;
 
-import org.example.Private.Sensitive;
+import org.example.DataBase.DatabaseConnection;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 
 public class MainPage extends JFrame {
-    private Connection conn;
+    private final Connection conn;
+    private final StatisticsUpdater statsUpdater;
 
     public MainPage() {
-        initDBConnection();
+        conn = DatabaseConnection.getInstance().getConnection();
+        statsUpdater = new StatisticsUpdater(conn);
+
         setTitle("Database Management");
-        setSize(600, 500);
+        setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        mainPanel.setBackground(Color.WHITE);
 
         JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        navbarPanel.setBorder(BorderFactory.createTitledBorder("Navigation"));
+        navbarPanel.setBackground(new Color(240, 240, 240));
 
-        Dimension buttonSize = new Dimension(150, 30);
+        Dimension buttonSize = new Dimension(150, 40);
 
-        JButton companyButton = new JButton("Company");
-        companyButton.setPreferredSize(buttonSize);
+        JButton companyButton = createStyledButton("Company", buttonSize);
         companyButton.addActionListener(new CompanyButtonClickListener());
         navbarPanel.add(companyButton);
 
-        JButton departmentButton = new JButton("Department");
-        departmentButton.setPreferredSize(buttonSize);
+        JButton departmentButton = createStyledButton("Department", buttonSize);
         departmentButton.addActionListener(new DepartmentButtonClickListener());
         navbarPanel.add(departmentButton);
 
-        JButton employeeButton = new JButton("Employee");
-        employeeButton.setPreferredSize(buttonSize);
+        JButton employeeButton = createStyledButton("Employee", buttonSize);
         employeeButton.addActionListener(new EmployeeButtonClickListener());
         navbarPanel.add(employeeButton);
 
-        JButton projectButton = new JButton("Project");
-        projectButton.setPreferredSize(buttonSize);
+        JButton projectButton = createStyledButton("Project", buttonSize);
         projectButton.addActionListener(new ProjectButtonClickListener());
         navbarPanel.add(projectButton);
 
-        JButton taskButton = new JButton("Task");
-        taskButton.setPreferredSize(buttonSize);
+        JButton taskButton = createStyledButton("Task", buttonSize);
         taskButton.addActionListener(new TaskButtonClickListener());
         navbarPanel.add(taskButton);
 
-        JButton timelogButton = new JButton("Time Log");
-        timelogButton.setPreferredSize(buttonSize);
+        JButton timelogButton = createStyledButton("Time Log", buttonSize);
         timelogButton.addActionListener(new TimeLogButtonClickListener());
         navbarPanel.add(timelogButton);
 
-        add(navbarPanel);
+        mainPanel.add(navbarPanel, BorderLayout.NORTH);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(Color.WHITE);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+        JPanel statsPanel = new JPanel(new BorderLayout());
+        statsPanel.setBorder(BorderFactory.createTitledBorder("Statistics"));
+        statsPanel.setBackground(new Color(255, 255, 255));
+
+        JPanel statsLabelsPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        statsLabelsPanel.setBackground(Color.WHITE);
+
+        JLabel companyStats = createStatsLabel("Companies: ");
+        statsLabelsPanel.add(companyStats);
+
+        JLabel departmentStats = createStatsLabel("Departments: ");
+        statsLabelsPanel.add(departmentStats);
+
+        JLabel employeeStats = createStatsLabel("Employees: ");
+        statsLabelsPanel.add(employeeStats);
+
+        JLabel projectStats = createStatsLabel("Projects: ");
+        statsLabelsPanel.add(projectStats);
+
+        JLabel taskStats = createStatsLabel("Tasks: ");
+        statsLabelsPanel.add(taskStats);
+
+        JLabel timelogStats = createStatsLabel("Time Logs: ");
+        statsLabelsPanel.add(timelogStats);
+
+        statsUpdater.updateStatistics(companyStats, departmentStats, employeeStats, projectStats, taskStats, timelogStats);
+
+        statsPanel.add(statsLabelsPanel, BorderLayout.CENTER);
+
+
+        //refresh button, could have tried to refresh the stats every x seconds
+        JButton refreshButton = createStyledButton("Refresh", new Dimension(100, 40));
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                statsUpdater.updateStatistics(companyStats, departmentStats, employeeStats, projectStats, taskStats, timelogStats);
+            }
+        });
+
+        JPanel refreshButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        refreshButtonPanel.setBackground(Color.WHITE);
+        refreshButtonPanel.add(refreshButton);
+        statsPanel.add(refreshButtonPanel, BorderLayout.SOUTH);
+
+        centerPanel.add(statsPanel, BorderLayout.NORTH);
+        //WIP might not even do it, but I will leave it here for now
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        searchPanel.setBackground(Color.WHITE);
+        JTextField searchField = new JTextField(20);
+        JButton searchButton = new JButton("Search");
+        searchPanel.add(searchField);
+        searchPanel.add(searchButton);
+        mainPanel.add(searchPanel, BorderLayout.SOUTH);
+
+        add(mainPanel);
     }
 
-    // Initialize the database connection
-    private void initDBConnection() {
-        try {
-            Class.forName("org.postgresql.Driver");
+    private JLabel createStatsLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.PLAIN, 14));
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+        return label;
+    }
 
-            String url = Sensitive.URL;
-            String user = Sensitive.USER;
-            String password = Sensitive.PASSWORD;
-
-            conn = DriverManager.getConnection(url, user, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error connecting to the database: " + e.getMessage(),
-                    "Database Connection Error", JOptionPane.ERROR_MESSAGE);
-        }
+    private JButton createStyledButton(String text, Dimension size) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(size);
+        button.setBackground(new Color(100, 150, 200));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        return button;
     }
 
     private class CompanyButtonClickListener implements ActionListener {

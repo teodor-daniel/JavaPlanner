@@ -5,6 +5,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.example.Crud.CRUDcompany;
+import org.example.Crud.CRUDdepartments;
 import org.example.Crud.CRUDemployees;
 import org.example.Interfaces.IScreen;
 import org.example.Models.Company;
@@ -12,7 +13,6 @@ import org.example.Models.Department;
 import org.example.Models.Employee;
 import org.example.Services.CompanyService;
 import org.example.Services.DepartmentService;
-import org.example.Crud.CRUDdepartments;
 import org.example.Services.EmployeeService;
 import org.example.Validation.CompanyValidation;
 import org.example.Validation.DepartmentValidation;
@@ -25,19 +25,19 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.sql.Connection;
 
 class DepartmentScreen extends JFrame implements IScreen {
-    private JTable departmentTable;
-    private Connection conn;
-    private JFrame mainPage;
     private final DepartmentService departmentService;
     private final CompanyService companyService;
     private final EmployeeService employeeService;
+    private final JTable departmentTable;
+    private final Connection conn;
+    private final JFrame mainPage;
     private boolean sortAscending = true;
 
     public DepartmentScreen(Connection conn, JFrame mainPage) {
@@ -86,8 +86,6 @@ class DepartmentScreen extends JFrame implements IScreen {
     }
 
 
-
-
     @Override
     public void loadData() {
         ArrayList<Department> departments = (ArrayList<Department>) departmentService.getAllDepartments(conn);
@@ -114,7 +112,6 @@ class DepartmentScreen extends JFrame implements IScreen {
         departmentTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
         departmentTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
     }
-
 
 
     @Override
@@ -146,8 +143,8 @@ class DepartmentScreen extends JFrame implements IScreen {
         if (result == JOptionPane.OK_OPTION) {
             Integer selectedCompanyId = (Integer) companyComboBox.getSelectedItem();
             Integer selectedManagerId = (Integer) managerComboBox.getSelectedItem();
-            System.out.println(selectedCompanyId +  " "  + selectedManagerId + " " + nameField.getText());
-            Department newDepartment = new Department(nameField.getText(),selectedCompanyId, selectedManagerId);
+            System.out.println(selectedCompanyId + " " + selectedManagerId + " " + nameField.getText());
+            Department newDepartment = new Department(nameField.getText(), selectedCompanyId, selectedManagerId);
             System.out.println(newDepartment);
             departmentService.addDepartment(conn, newDepartment);
             loadData();
@@ -189,12 +186,12 @@ class DepartmentScreen extends JFrame implements IScreen {
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Department", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                    department.setName(nameField.getText());
-                    department.setCompanyId((Integer) companyComboBox.getSelectedItem());
-                    department.setManagerId((Integer) managerComboBox.getSelectedItem());
-                    System.out.println(department);
-                    departmentService.updateDepartment(conn, department);
-                    loadData();
+                department.setName(nameField.getText());
+                department.setCompanyId((Integer) companyComboBox.getSelectedItem());
+                department.setManagerId((Integer) managerComboBox.getSelectedItem());
+                System.out.println(department);
+                departmentService.updateDepartment(conn, department);
+                loadData();
             }
         }
     }
@@ -215,6 +212,7 @@ class DepartmentScreen extends JFrame implements IScreen {
             departmentService.deleteDepartmentById(conn, id);
             loadData();
         }
+
     }
 
     private void saveTableDataToPDF() throws DocumentException, FileNotFoundException {
@@ -222,13 +220,15 @@ class DepartmentScreen extends JFrame implements IScreen {
         PdfWriter.getInstance(document, new FileOutputStream("DepartmentData.pdf"));
         document.open();
 
-        PdfPTable pdfTable = new PdfPTable(departmentTable.getColumnCount());
-        for (int i = 0; i < departmentTable.getColumnCount(); i++) {
+        int numberOfColumns = departmentTable.getColumnCount() - 2;
+        PdfPTable pdfTable = new PdfPTable(numberOfColumns);
+
+        for (int i = 0; i < numberOfColumns; i++) {
             pdfTable.addCell(departmentTable.getColumnName(i));
         }
 
         for (int rows = 0; rows < departmentTable.getRowCount(); rows++) {
-            for (int cols = 0; cols < departmentTable.getColumnCount(); cols++) {
+            for (int cols = 0; cols < numberOfColumns; cols++) {
                 pdfTable.addCell(departmentTable.getModel().getValueAt(rows, cols).toString());
             }
         }
@@ -237,6 +237,7 @@ class DepartmentScreen extends JFrame implements IScreen {
         document.close();
         JOptionPane.showMessageDialog(this, "PDF file has been created successfully!");
     }
+
 
     private void toggleSort() {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(departmentTable.getModel());

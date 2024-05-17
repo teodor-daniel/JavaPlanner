@@ -21,6 +21,7 @@ public class Department {
         this.companyId = companyId;
         this.managerId = null;
     }
+
     public Department(String name, Integer companyId, Integer managerId) {
         this.name = name;
         this.companyId = companyId;

@@ -181,6 +181,8 @@ public class ProjectScreen extends JFrame implements IScreen {
                 departmentComboBox.addItem(department.getId());
             }
             for (Employee teamLead : teamLeads) {
+                if(teamLead.getEmployedStatus().equals("Resigned"))
+                    continue;
                 teamLeadComboBox.addItem(teamLead.getId());
             }
 

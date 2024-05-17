@@ -2,9 +2,6 @@
   <artifact type="jar" name="JavaWorkPlanner:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/JavaWorkPlanner_jar</output-path>
     <root id="archive" name="JavaWorkPlanner.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
-      </element>
       <element id="module-output" name="JavaWorkPlanner" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/itextpdf/itextpdf/5.5.13.2/itextpdf-5.5.13.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/checkerframework/checker-qual/3.42.0/checker-qual-3.42.0.jar" path-in-jar="/" />

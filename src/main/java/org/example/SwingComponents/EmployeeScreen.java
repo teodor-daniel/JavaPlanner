@@ -7,6 +7,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.example.Crud.CRUDcompany;
 import org.example.Crud.CRUDdepartments;
 import org.example.Crud.CRUDemployees;
+import org.example.Enum.ActivityState;
+import org.example.Enum.EmployeeState;
 import org.example.Interfaces.IScreen;
 import org.example.Models.Company;
 import org.example.Models.Department;
@@ -128,6 +130,8 @@ public class EmployeeScreen extends JFrame implements IScreen {
         JComboBox<Integer> companyComboBox = new JComboBox<>();
         JComboBox<Integer> departmentComboBox = new JComboBox<>();
         JComboBox<Integer> managerComboBox = new JComboBox<>();
+        JComboBox<String> statusComboBox = new JComboBox<>();
+
         JTextField statusField = new JTextField();
 
         JPanel panel = new JPanel(new GridLayout(9, 2));
@@ -142,7 +146,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
         panel.add(new JLabel("Salary:"));
         panel.add(salaryField);
         panel.add(new JLabel("Employment Status:"));
-        panel.add(statusField);
+        panel.add(statusComboBox);
         panel.add(new JLabel("Company ID:"));
         panel.add(companyComboBox);
         panel.add(new JLabel("Department ID:"));
@@ -153,7 +157,10 @@ public class EmployeeScreen extends JFrame implements IScreen {
         List<Company> companies = companyService.getAllCompanies(conn);
         List<Department> departments = departmentService.getAllDepartments(conn);
         List<Employee> managers = employeeService.getAllManager(conn);
-
+        List<String> stats = new ArrayList<>();
+        for(EmployeeState employeeState : EmployeeState.values()){
+            stats.add(employeeState.toString());
+        }
         for(Company company: companies){
             companyComboBox.addItem(company.getId());
         }
@@ -164,13 +171,16 @@ public class EmployeeScreen extends JFrame implements IScreen {
             managerComboBox.addItem(manager.getId());
         }
 
+        for(String status: stats){
+            statusComboBox.addItem(status);
+        }
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Employee", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             Integer selectedCompany = (Integer) companyComboBox.getSelectedItem();
             Integer selectedDepartment = (Integer) departmentComboBox.getSelectedItem();
             Integer selectedManager = (Integer) managerComboBox.getSelectedItem();
-
+            String  selectedStatus = (String) statusComboBox.getSelectedItem();
             Employee newEmployee = new Employee(
                     nameField.getText(),
                     Integer.parseInt(ageField.getText()),
@@ -180,7 +190,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
                     selectedDepartment,
                     selectedCompany,
                     selectedManager,
-                    statusField.getText()
+                    selectedStatus
             );
 
             System.out.println(newEmployee);
@@ -204,7 +214,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
             JTextField phoneField = new JTextField(employee.getPhoneNumber());
             JTextField emailField = new JTextField(employee.getEmail());
             JTextField salaryField = new JTextField(String.valueOf(employee.getSalary()));
-            JTextField statusField = new JTextField(employee.getEmployedStatus());
+            JComboBox<String> statusComboBox = new JComboBox<>();
 
             JComboBox<Integer> companyComboBox = new JComboBox<>();
             JComboBox<Integer> departmentComboBox = new JComboBox<>();
@@ -222,6 +232,11 @@ public class EmployeeScreen extends JFrame implements IScreen {
                 managerComboBox.addItem(manager.getId());
             }
 
+            for(EmployeeState employeeState : EmployeeState.values()){
+
+                statusComboBox.addItem(employeeState.toString());
+            }
+
             JPanel panel = new JPanel(new GridLayout(9, 2));
             panel.add(new JLabel("Name:"));
             panel.add(nameField);
@@ -234,7 +249,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
             panel.add(new JLabel("Salary:"));
             panel.add(salaryField);
             panel.add(new JLabel("Employment Status:"));
-            panel.add(statusField);
+            panel.add(statusComboBox);
             panel.add(new JLabel("Company ID:"));
             panel.add(companyComboBox);
             panel.add(new JLabel("Department ID:"));
@@ -251,7 +266,7 @@ public class EmployeeScreen extends JFrame implements IScreen {
                 employee.setPhoneNumber(phoneField.getText());
                 employee.setEmail(emailField.getText());
                 employee.setSalary(Double.parseDouble(salaryField.getText()));
-                employee.setEmployedStatus(statusField.getText());
+                employee.setEmployedStatus( (String) statusComboBox.getSelectedItem());
                 employee.setCompanyId((Integer) companyComboBox.getSelectedItem());
                 employee.setDepartment((Integer) departmentComboBox.getSelectedItem());
                 employee.setManagerId(managerComboBox.getSelectedItem() == null ? null : (Integer) managerComboBox.getSelectedItem());

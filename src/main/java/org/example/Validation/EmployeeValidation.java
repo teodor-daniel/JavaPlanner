@@ -1,5 +1,6 @@
 package org.example.Validation;
 
+import org.example.Enum.EmployeeState;
 import org.example.Interfaces.IValidation;
 import org.example.Models.Employee;
 import org.example.Exceptions.*;
@@ -51,7 +52,7 @@ public class EmployeeValidation implements IValidation<Employee> {
     }
 
     private void validateEmploymentStatus(String status) {
-        if (status == null || !(status.equals("Working") || status.equals("Unemployed") || status.equals("Retired"))) {
+        if (status == null || (!status.equalsIgnoreCase(EmployeeState.ACTIVE.toString()) && !status.equalsIgnoreCase(EmployeeState.INACTIVE.toString()) && !status.equalsIgnoreCase(EmployeeState.ON_LEAVE.toString()) && !status.equalsIgnoreCase(EmployeeState.RESIGNED.toString()))) {
             throw new InvalidEmploymentStatusException("Error: Employment status is invalid. Valid statuses are 'Working', 'Unemployed', or 'Retired'.");
         }
     }

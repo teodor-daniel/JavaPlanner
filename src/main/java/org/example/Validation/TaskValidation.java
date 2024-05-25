@@ -1,8 +1,9 @@
 package org.example.Validation;
 
+import org.example.Enum.ActivityState;
+import org.example.Exceptions.*;
 import org.example.Interfaces.IValidation;
 import org.example.Models.Task;
-import org.example.Exceptions.*;
 
 public class TaskValidation implements IValidation<Task> {
 
@@ -37,8 +38,10 @@ public class TaskValidation implements IValidation<Task> {
     }
 
     private void validateStatus(String status) {
-        if (status == null || (!status.equalsIgnoreCase("Pending") && !status.equalsIgnoreCase("Completed") && !status.equalsIgnoreCase("In Progress"))) {
-            throw new InvalidTaskStatusException("Error: Status is invalid. Valid statuses are 'Pending', 'Completed', or 'In Progress'.");
+        try {
+            ActivityState.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTaskStatusException("Error: Status is invalid. Valid statuses are 'IN_PROGRESS', 'COMPLETED', or 'NOT_STARTED'.");
         }
     }
 }

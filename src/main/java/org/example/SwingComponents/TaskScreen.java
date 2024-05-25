@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.example.Crud.CRUDemployees;
 import org.example.Crud.CRUDprojects;
 import org.example.Crud.CRUDtasks;
+import org.example.Enum.ActivityState;
 import org.example.Interfaces.IScreen;
 import org.example.Models.Employee;
 import org.example.Models.Project;
@@ -17,6 +18,9 @@ import org.example.Services.TaskService;
 import org.example.Validation.EmployeeValidation;
 import org.example.Validation.ProjectValidation;
 import org.example.Validation.TaskValidation;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,10 +31,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class TaskScreen extends JFrame implements IScreen {
     private final EmployeeService employeeService = new EmployeeService(new CRUDemployees(), new EmployeeValidation());
@@ -73,7 +76,6 @@ public class TaskScreen extends JFrame implements IScreen {
 
         sortButton.addActionListener(e -> toggleSort());
 
-
         bottomPanel.add(addButton);
         bottomPanel.add(backButton);
         bottomPanel.add(pdfButton);
@@ -85,7 +87,6 @@ public class TaskScreen extends JFrame implements IScreen {
 
         loadData();
     }
-
 
     @Override
     public void loadData() {
@@ -114,15 +115,13 @@ public class TaskScreen extends JFrame implements IScreen {
         taskTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), "Update", rowIndex -> updateData(rowIndex)));
         taskTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
         taskTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), "Delete", rowIndex -> confirmAndDeleteData(rowIndex)));
-
     }
 
     @Override
     public void openAddDataDialog() {
         JTextField nameField = new JTextField();
         JTextField descriptionField = new JTextField();
-        JTextField statusField = new JTextField();
-        JTextField dueDateField = new JTextField();
+        JComboBox<ActivityState> statusComboBox = new JComboBox<>(ActivityState.values());
         JComboBox<Integer> assignedToComboBox = new JComboBox<>();
         JComboBox<Integer> projectComboBox = new JComboBox<>();
 
@@ -136,15 +135,24 @@ public class TaskScreen extends JFrame implements IScreen {
             projectComboBox.addItem(project.getId());
         }
 
+        // Date picker component
+        UtilDateModel model = new UtilDateModel();
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+
         JPanel panel = new JPanel(new GridLayout(6, 2));
         panel.add(new JLabel("Name:"));
         panel.add(nameField);
         panel.add(new JLabel("Description:"));
         panel.add(descriptionField);
         panel.add(new JLabel("Status:"));
-        panel.add(statusField);
+        panel.add(statusComboBox);
         panel.add(new JLabel("Due Date:"));
-        panel.add(dueDateField);
+        panel.add(datePicker);
         panel.add(new JLabel("Assigned To:"));
         panel.add(assignedToComboBox);
         panel.add(new JLabel("Project ID:"));
@@ -152,19 +160,19 @@ public class TaskScreen extends JFrame implements IScreen {
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Add New Task", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
+            Date selectedDate = new Date(model.getValue().getTime());
             Task newTask = new Task(
                     nameField.getText(),
                     descriptionField.getText(),
-                    Date.valueOf(dueDateField.getText()),
-                    statusField.getText(),
-                    ((Employee) assignedToComboBox.getSelectedItem()).getId(),
-                    ((Project) projectComboBox.getSelectedItem()).getId()
+                    selectedDate,
+                    statusComboBox.getSelectedItem().toString(),
+                    (Integer) assignedToComboBox.getSelectedItem(),
+                    (Integer) projectComboBox.getSelectedItem()
             );
             taskService.addTask(conn, newTask);
             loadData();
         }
     }
-
 
     @Override
     public void updateData(int rowIndex) {
@@ -177,8 +185,8 @@ public class TaskScreen extends JFrame implements IScreen {
 
             JTextField nameField = new JTextField(task.getName());
             JTextField descriptionField = new JTextField(task.getDescription());
-            JTextField statusField = new JTextField(task.getStatus());
-            JTextField dueDateField = new JTextField(task.getDueDate().toString());
+            JComboBox<ActivityState> statusComboBox = new JComboBox<>(ActivityState.values());
+            statusComboBox.setSelectedItem(ActivityState.valueOf(task.getStatus().toUpperCase()));
 
             JComboBox<Integer> assignedToComboBox = new JComboBox<>();
             JComboBox<Integer> projectComboBox = new JComboBox<>();
@@ -196,15 +204,24 @@ public class TaskScreen extends JFrame implements IScreen {
             assignedToComboBox.setSelectedItem(task.getAssignedTo());
             projectComboBox.setSelectedItem(task.getProjectId());
 
+            // Date picker component with initial value
+            UtilDateModel dateModel = new UtilDateModel(task.getDueDate());
+            Properties p = new Properties();
+            p.put("text.today", "Today");
+            p.put("text.month", "Month");
+            p.put("text.year", "Year");
+            JDatePanelImpl datePanel = new JDatePanelImpl(dateModel, p);
+            JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+
             JPanel panel = new JPanel(new GridLayout(6, 2));
             panel.add(new JLabel("Name:"));
             panel.add(nameField);
             panel.add(new JLabel("Description:"));
             panel.add(descriptionField);
             panel.add(new JLabel("Status:"));
-            panel.add(statusField);
+            panel.add(statusComboBox);
             panel.add(new JLabel("Due Date:"));
-            panel.add(dueDateField);
+            panel.add(datePicker);
             panel.add(new JLabel("Assigned To:"));
             panel.add(assignedToComboBox);
             panel.add(new JLabel("Project ID:"));
@@ -212,10 +229,11 @@ public class TaskScreen extends JFrame implements IScreen {
 
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Task", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
+                Date selectedDate = new Date(dateModel.getValue().getTime());
                 task.setName(nameField.getText());
                 task.setDescription(descriptionField.getText());
-                task.setStatus(statusField.getText());
-                task.setDueDate(Date.valueOf(dueDateField.getText()));
+                task.setStatus(statusComboBox.getSelectedItem().toString());
+                task.setDueDate(selectedDate);
                 task.setAssignedTo((Integer) assignedToComboBox.getSelectedItem());
                 task.setProjectId((Integer) projectComboBox.getSelectedItem());
 
@@ -274,12 +292,7 @@ public class TaskScreen extends JFrame implements IScreen {
         int columnIndexToSort = 1;
         sortKeys.add(new RowSorter.SortKey(columnIndexToSort, sortAscending ? SortOrder.ASCENDING : SortOrder.DESCENDING));
 
-        sorter.setComparator(columnIndexToSort, new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
+        sorter.setComparator(columnIndexToSort, Comparator.naturalOrder());
 
         sorter.setSortKeys(sortKeys);
         sorter.sort();
@@ -287,4 +300,22 @@ public class TaskScreen extends JFrame implements IScreen {
         sortAscending = !sortAscending;
     }
 
+    private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
+        private final String datePattern = "yyyy-MM-dd";
+        private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+        @Override
+        public Object stringToValue(String text) throws java.text.ParseException {
+            return dateFormatter.parseObject(text);
+        }
+
+        @Override
+        public String valueToString(Object value) throws java.text.ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
+            return "";
+        }
+    }
 }

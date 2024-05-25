@@ -1,8 +1,6 @@
 package org.example.Models;
 
-import org.example.Interfaces.Iemployee;
-
-public class Employee extends PersonA implements Iemployee {
+public class Employee extends PersonA {
     private int id;
     private double salary;
     private String employedStatus;
@@ -99,16 +97,6 @@ public class Employee extends PersonA implements Iemployee {
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
-    }
-
-    @Override
-    public String isEmployed() {
-    return this.employedStatus;
-    }
-
-    @Override
-    public void resign() {
-        this.employedStatus = "Resigned";
     }
 
     @Override

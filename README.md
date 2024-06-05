@@ -26,3 +26,10 @@ This is a Java-based CRUD application with a Swing user interface and a PostgreS
 
 - **Add, update, delete, and view records**: Use the Swing interface to manage records in the database tables.
 - **Export data**: Generate PDF documents with data from the tables using the provided functionality.
+
+## Demo Video
+
+Watch the demo video on YouTube:
+
+[https://youtu.be/J4U_DjkSkDU](https://youtu.be/J4U_DjkSkDU)
+

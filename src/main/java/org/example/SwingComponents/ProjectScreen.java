@@ -117,12 +117,12 @@ public class ProjectScreen extends JFrame implements IScreen {
     @Override
     public void openAddDataDialog() {
         JTextField nameField = new JTextField();
-        JTextField statusField = new JTextField();
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Not Started", "In Progress", "Completed"});
         JTextField budgetField = new JTextField();
         JComboBox<Integer> departmentComboBox = new JComboBox<>();
         JComboBox<Integer> teamLeadComboBox = new JComboBox<>();
 
-        java.util.List<Department> departments = departmentService.getAllDepartments(conn);
+        List<Department> departments = departmentService.getAllDepartments(conn);
         List<Employee> teamLeads = employeeService.getAllManager(conn);
 
         for (Department department : departments) {
@@ -136,7 +136,7 @@ public class ProjectScreen extends JFrame implements IScreen {
         panel.add(new JLabel("Name:"));
         panel.add(nameField);
         panel.add(new JLabel("Status:"));
-        panel.add(statusField);
+        panel.add(statusComboBox);
         panel.add(new JLabel("Budget:"));
         panel.add(budgetField);
         panel.add(new JLabel("Department ID:"));
@@ -148,7 +148,7 @@ public class ProjectScreen extends JFrame implements IScreen {
         if (result == JOptionPane.OK_OPTION) {
             Project newProject = new Project(
                     nameField.getText(),
-                    statusField.getText(),
+                    (String) statusComboBox.getSelectedItem(),
                     Double.parseDouble(budgetField.getText()),
                     (Integer) departmentComboBox.getSelectedItem(),
                     (Integer) teamLeadComboBox.getSelectedItem()
@@ -157,7 +157,6 @@ public class ProjectScreen extends JFrame implements IScreen {
             loadData();
         }
     }
-
 
     @Override
     public void updateData(int rowIndex) {
@@ -169,7 +168,8 @@ public class ProjectScreen extends JFrame implements IScreen {
             Project project = projectOptional.get();
 
             JTextField nameField = new JTextField(project.getName());
-            JTextField statusField = new JTextField(project.getStatus());
+            JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Not Started", "In Progress", "Completed"});
+            statusComboBox.setSelectedItem(project.getStatus());
             JTextField budgetField = new JTextField(String.valueOf(project.getBudget()));
             JComboBox<Integer> departmentComboBox = new JComboBox<>();
             JComboBox<Integer> teamLeadComboBox = new JComboBox<>();
@@ -193,7 +193,7 @@ public class ProjectScreen extends JFrame implements IScreen {
             panel.add(new JLabel("Name:"));
             panel.add(nameField);
             panel.add(new JLabel("Status:"));
-            panel.add(statusField);
+            panel.add(statusComboBox);
             panel.add(new JLabel("Budget:"));
             panel.add(budgetField);
             panel.add(new JLabel("Department ID:"));
@@ -204,7 +204,7 @@ public class ProjectScreen extends JFrame implements IScreen {
             int result = JOptionPane.showConfirmDialog(null, panel, "Update Project", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 project.setName(nameField.getText());
-                project.setStatus(statusField.getText());
+                project.setStatus((String) statusComboBox.getSelectedItem());
                 project.setBudget(Double.parseDouble(budgetField.getText()));
                 project.setDepartmentId((Integer) departmentComboBox.getSelectedItem());
                 project.setTeamLead((Integer) teamLeadComboBox.getSelectedItem());

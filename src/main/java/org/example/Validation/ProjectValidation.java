@@ -1,8 +1,11 @@
 package org.example.Validation;
 
+import org.example.Exceptions.InvalidDepartmentIdException;
+import org.example.Exceptions.InvalidEmailException;
+import org.example.Exceptions.InvalidProjectException;
+import org.example.Exceptions.InvalidSalaryException;
 import org.example.Interfaces.IValidation;
 import org.example.Models.Project;
-import org.example.Exceptions.*;
 
 public class ProjectValidation implements IValidation<Project> {
 
@@ -34,4 +37,11 @@ public class ProjectValidation implements IValidation<Project> {
             throw new InvalidSalaryException("Error: Budget cannot be negative.");
         }
     }
+
+    private void validateStatus(String status) {
+        if (status == null || (!status.equals("Not Started") && !status.equals("In Progress") && !status.equals("Completed"))) {
+            throw new InvalidProjectException("Error: Project status is invalid. It must be one of the following: Not Started, In Progress, Completed.");
+        }
+    }
+
 }

@@ -30,27 +30,27 @@ This is a Java-based CRUD application with a Swing user interface and a PostgreS
 ## UML Diagrams
 
 ### Models
-![Models UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/Models.png)
+![Models UML Diagram](ScreenShots/Models.png)
 This diagram shows the models used to map the database tables to Java objects.
 
 ### CrudRepository
-![CrudRepository UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/CRUD.png)
+![CrudRepository UML Diagram](ScreenShots/CRUD.png)
 This diagram illustrates the CRUD repository components, providing basic operations for interacting with the database.
 
 ### Validations
-![Validations UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/Validation.png)
+![Validations UML Diagram](ScreenShots/Validation.png)
 This diagram outlines the validation components, ensuring that data entered into the application meets certain criteria before being processed.
 
 ### Services
-![Services UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/Services.png)
+![Services UML Diagram](ScreenShots/Services.png)
 This diagram shows the service layer components, responsible for business logic and communication between the repository and the user interface.
 
 ### SwingComponents
-![SwingComponents UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/Screens.png)
+![SwingComponents UML Diagram](ScreenShots/Screens.png)
 This diagram details the Swing components used to create the graphical user interface, allowing users to interact with the application.
 
 ### Main
-![Main UML Diagram](C:/Users/Teodor-Daniel/Desktop/JavaPlanner/ScreenShots/FullProject.png)
+![Main UML Diagram](ScreenShots/FullProject.png)
 This diagram provides an overview of the entire project, showing how all the components are connected and interact with each other.
 
 ## Demo Video
